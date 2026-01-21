@@ -4,9 +4,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowRight, 
-  CheckCircle, 
+import {
+  ArrowRight,
+  CheckCircle,
   Sparkles,
   Briefcase,
   Building,
@@ -18,6 +18,8 @@ import {
   Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/lib/CartContext';
+import { toast } from 'sonner';
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -97,7 +99,7 @@ const HeroSection = () => {
         setIsTransitioning(false);
       }, 300);
     }, 6000);
-    
+
     return () => clearInterval(interval);
   }, [slides.length]);
 
@@ -114,7 +116,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-white overflow-hidden pt-15 md:pt-15">
-      
+
       {/* Soft Brand Background Bubbles - Mobile Optimized */}
       <div className="absolute inset-0">
         <motion.div
@@ -136,7 +138,7 @@ const HeroSection = () => {
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 z-10 max-w-7xl py-4 md:py-8">
         <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center min-h-[calc(100vh-4rem)]">
-          
+
           {/* LEFT SIDE - Mobile First */}
           <div className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left order-2 lg:order-1">
 
@@ -212,37 +214,42 @@ const HeroSection = () => {
               ))}
             </motion.div>
 
-            {/* CTA BUTTONS - Mobile Optimized */}
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center lg:justify-start mb-4 sm:mb-5"
+            {/* CTA BUTTONS - Redesigned for Premium Look */}
+            <motion.div
+              className="flex flex-wrap gap-4 justify-center lg:justify-start mb-8 items-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <Link href={currentSlideData.button1Link} className="w-full sm:w-auto">
-                <Button className="bg-primary hover:bg-primary-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center gap-2 hover:scale-105 transition-transform w-full sm:w-auto text-sm sm:text-base">
-                  {currentSlideData.button1Text}
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                </Button>
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Link href={currentSlideData.button1Link} className="w-full sm:w-auto">
+                  <Button className="h-12 md:h-14 px-8 bg-primary hover:bg-primary-700 text-white rounded-xl font-bold flex items-center gap-2 hover:scale-[1.02] transition-all w-full shadow-lg shadow-primary/20">
+                    {currentSlideData.button1Text}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
 
-              <Link href={currentSlideData.button2Link} className="w-full sm:w-auto">
-                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center gap-2 transition-all w-full sm:w-auto text-sm sm:text-base">
-                  {currentSlideData.button2Text}
-                </Button>
-              </Link>
+                <Link href={currentSlideData.button2Link} className="w-full sm:w-auto">
+                  <Button variant="outline" className="h-12 md:h-14 px-8 border-2 border-primary/20 text-primary hover:bg-primary/5 rounded-xl font-bold transition-all w-full">
+                    {currentSlideData.button2Text}
+                  </Button>
+                </Link>
+              </div>
 
-               {/* Add this new button for paid services */}
+              <div className="hidden sm:block h-8 w-[1px] bg-gray-200 mx-2" />
+
               <Link href="/services/career-packages" className="w-full sm:w-auto">
-                <Button className="bg-primary hover:bg-primary-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center gap-2 hover:scale-105 transition-transform w-full sm:w-auto text-sm sm:text-base">
-                  <Star className="w-3 h-3 sm:w-4 sm:h-4" />
-                  Premium Services
+                <Button className="h-12 md:h-14 px-8 bg-slate-900 hover:bg-black text-white rounded-xl font-bold flex items-center gap-2 hover:scale-[1.02] transition-all w-full shadow-xl relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Star className="w-4 h-4 text-amber-400 fill-amber-400 group-hover:rotate-12 transition-transform" />
+                  <span>Premium Services</span>
+                  <div className="ml-1 px-1.5 py-0.5 rounded-md bg-amber-400 text-[10px] text-black font-black uppercase tracking-tighter">NEW</div>
                 </Button>
               </Link>
             </motion.div>
 
             {/* STATS - Mobile Optimized */}
-            <motion.div 
+            <motion.div
               className="flex gap-4 sm:gap-6 md:gap-8 pt-4 sm:pt-6 border-t border-gray-200 justify-center lg:justify-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -264,7 +271,7 @@ const HeroSection = () => {
           </div>
 
           {/* RIGHT SIDE IMAGE - Mobile Optimized */}
-          <motion.div 
+          <motion.div
             className="relative h-48 sm:h-64 md:h-80 lg:h-[500px] xl:h-[600px] flex items-center justify-center order-1 lg:order-2 mb-4 sm:mb-6 lg:mb-0"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -301,11 +308,10 @@ const HeroSection = () => {
                   return (
                     <motion.div
                       key={element.text}
-                      className={`absolute ${
-                        index === 0 ? "top-2 right-2 sm:top-4 sm:right-4" :
+                      className={`absolute ${index === 0 ? "top-2 right-2 sm:top-4 sm:right-4" :
                         index === 1 ? "bottom-12 left-2 sm:bottom-16 sm:left-4" :
-                        "bottom-2 right-2 sm:bottom-4 sm:right-4"
-                      } bg-white/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 shadow-lg border border-gray-200`}
+                          "bottom-2 right-2 sm:bottom-4 sm:right-4"
+                        } bg-white/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 shadow-lg border border-gray-200`}
                       initial={{ opacity: 0, y: index === 0 ? -10 : 10, scale: 0.8 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}

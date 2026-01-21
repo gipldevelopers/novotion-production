@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCart } from '@/lib/CartContext';
+import Image from 'next/image';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -118,8 +119,14 @@ function PaymentSuccessContent() {
 export default function PaymentSuccess() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="relative flex flex-col items-center gap-4">
+          <div className="relative w-16 h-16">
+            <Image src="/favicon.ico" alt="Novotion" width={64} height={64} className="animate-pulse" />
+            <div className="absolute -inset-4 border-4 border-blue-50 border-t-blue-600 rounded-full animate-spin"></div>
+          </div>
+          <div className="text-blue-600 font-bold tracking-widest text-xs uppercase animate-pulse">Confirming Payment</div>
+        </div>
       </div>
     }>
       <PaymentSuccessContent />

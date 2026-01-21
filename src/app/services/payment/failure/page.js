@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { XCircle, AlertCircle, Home, RefreshCw, MessageCircle, Loader2 } from 'lucide-react';
+import { XCircle, AlertCircle, Home, RefreshCw, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';

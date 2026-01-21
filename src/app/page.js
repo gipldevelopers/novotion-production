@@ -494,7 +494,7 @@ const Home = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-6 md:mb-8 px-4">
-               <Link href="/contact/#contact-form" className="w-full sm:w-auto">
+              <Link href="/contact/#contact-form" className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   className="group bg-white text-foreground hover:bg-gray-100 px-4 md:px-6 py-3 text-sm md:text-base font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto"

@@ -1,477 +1,47 @@
-// 'use client';
-// import { useState } from 'react';
-// import Link from 'next/link';
-// import { 
-//   Star, 
-//   TrendingUp, 
-//   Zap, 
-//   Target, 
-//   CheckCircle, 
-//   ArrowRight,
-//   Shield,
-//   Clock,
-//   Users,
-//   Award,
-//   Sparkles,
-//   Rocket,
-//   CreditCard,
-//   Briefcase,
-//   FileText,
-//   MessageSquare,
-//   BadgeCheck
-// } from 'lucide-react';
-// import { Button } from '@/components/ui/button';
-
-// const PaidServicesSection = () => {
-//   const [hoveredPackage, setHoveredPackage] = useState(null);
-
-//   const careerPackages = [
-//     {
-//       id: 'application-boost',
-//       name: 'Application Boost',
-//       price: 1499,
-//       originalPrice: 1999,
-//       description: 'Kickstart your job search with optimized materials',
-//       icon: FileText,
-//       features: [
-//         'Professional Resume Optimization',
-//         'LinkedIn Profile Enhancement',
-//         'Strategy Consultation Call',
-//         'Cover Letter Template',
-//         '30-day Support'
-//       ],
-//     //   badge: 'Most Popular',
-//       color: 'blue'
-//     },
-//     {
-//       id: 'interview-edge',
-//       name: 'Interview Edge',
-//       price: 2499,
-//       originalPrice: 3299,
-//       description: 'Master interviews and land your dream role',
-//       icon: MessageSquare,
-//       features: [
-//         'Comprehensive Interview Prep',
-//         'Premium Resume Upgrade',
-//         'Role-Specific Mock Interviews',
-//         'Salary Negotiation Strategy',
-//         '60-day Support'
-//       ],
-//       badge: 'Best Value',
-//       color: 'green'
-//     },
-//     {
-//       id: 'all-in-one',
-//       name: 'All-In-One Advance',
-//       price: 6106,
-//       originalPrice: 7999,
-//       description: 'Complete career transformation package',
-//       icon: Award,
-//       features: [
-//         'Full Career Strategy Development',
-//         'Unlimited Resume Updates',
-//         'Direct Recruiter Introductions',
-//         'Priority Job Referrals',
-//         '90-day Intensive Support'
-//       ],
-//       badge: 'Premium',
-//       color: 'purple'
-//     }
-//   ];
-
-//   const proServices = [
-//     {
-//       name: 'Resume Upgrade Pro',
-//       price: 299,
-//       icon: FileText,
-//       description: 'Professional resume rewriting'
-//     },
-//     {
-//       name: 'Profile Verification',
-//       price: 149,
-//       icon: BadgeCheck,
-//       description: 'Complete profile validation'
-//     },
-//     {
-//       name: 'LinkedIn Premium',
-//       price: 199,
-//       icon: Briefcase,
-//       description: 'Executive LinkedIn optimization'
-//     },
-//     {
-//       name: 'Interview Simulation',
-//       price: 349,
-//       icon: MessageSquare,
-//       description: 'Real-time interview practice'
-//     }
-//   ];
-
-//   const careerPlans = [
-//     {
-//       name: 'Basic Plan',
-//       price: 2500,
-//       placementFee: '15%',
-//       features: '10 Interviews, Resume Optimization, AI Marketing',
-//       installment: 625
-//     },
-//     {
-//       name: 'Standard Plan',
-//       price: 3500,
-//       placementFee: '12%',
-//       features: '15 Interviews, Mock Interviews, Priority Submissions',
-//       installment: 875,
-//       popular: true
-//     },
-//     {
-//       name: 'Premium Plan',
-//       price: 5000,
-//       placementFee: '10%',
-//       features: '22 Interviews, Technical Training, VIP Support',
-//       installment: 1250
-//     }
-//   ];
-
-//   const colorClasses = {
-//     blue: 'bg-blue-600',
-//     green: 'bg-green-600',
-//     purple: 'bg-purple-600'
-//   };
-
-//   return (
-//     <section className="py-12 md:py-20 lg:min-h-[80vh] flex items-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 relative overflow-hidden">
-      
-//       {/* Background Elements */}
-//       <div className="absolute inset-0">
-//         <div className="absolute top-0 right-0 w-40 h-40 md:w-80 md:h-80 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-//         <div className="absolute bottom-0 left-0 w-40 h-40 md:w-80 md:h-80 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl animate-float-delayed"></div>
-//       </div>
-
-//       <div className="container mx-auto px-4 md:px-6 py-8 md:py-16 relative z-10">
-//         <div className="max-w-6xl mx-auto">
-          
-//           {/* Section Header */}
-//           <div className="text-center mb-12 md:mb-16">
-//             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 text-primary font-medium mb-4">
-//               <Star className="h-4 w-4 mr-2" />
-//               Premium Career Services
-//             </div>
-//             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-//               Invest in Your
-//               <span className="block text-primary">
-//                 Career Success
-//               </span>
-//             </h2>
-//             <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto">
-//               Professional career services designed to accelerate your job search and maximize your earning potential
-//             </p>
-//           </div>
-
-//           {/* Career Packages */}
-//           <div className="mb-16 md:mb-20">
-//             <div className="flex items-center justify-between mb-8">
-//               <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Career Growth Packages</h3>
-//               <Link href="/services/career-packages">
-//                 <Button variant="ghost" className="text-primary hover:text-primary-700">
-//                   View All Packages
-//                   <ArrowRight className="ml-2 h-4 w-4" />
-//                 </Button>
-//               </Link>
-//             </div>
-
-//             <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-//               {careerPackages.map((pkg) => {
-//                 const Icon = pkg.icon;
-//                 return (
-//                   <div
-//                     key={pkg.id}
-//                     className="relative group"
-//                     onMouseEnter={() => setHoveredPackage(pkg.id)}
-//                     onMouseLeave={() => setHoveredPackage(null)}
-//                   >
-//                     <div className={`absolute inset-0 ${colorClasses[pkg.color]} rounded-2xl opacity-5 group-hover:opacity-10 transition-opacity`}></div>
-                    
-//                     <div className="relative bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-                      
-//                       {pkg.badge && (
-//                         <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${colorClasses[pkg.color]} text-white px-4 py-1 rounded-full text-sm font-semibold`}>
-//                           {pkg.badge}
-//                         </div>
-//                       )}
-
-//                       {/* Icon */}
-//                       <div className="flex justify-center mb-6">
-//                         <div className={`h-16 w-16 rounded-2xl ${colorClasses[pkg.color]} flex items-center justify-center shadow-lg`}>
-//                           <Icon className="h-8 w-8 text-white" />
-//                         </div>
-//                       </div>
-
-//                       {/* Title & Description */}
-//                       <div className="text-center mb-6">
-//                         <h4 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{pkg.name}</h4>
-//                         <p className="text-gray-600">{pkg.description}</p>
-//                       </div>
-
-//                       {/* Price */}
-//                       <div className="text-center mb-6">
-//                         <div className="flex items-center justify-center gap-2 mb-1">
-//                           <span className="text-3xl md:text-4xl font-bold text-gray-900">${pkg.price}</span>
-//                           <span className="text-gray-400 line-through">${pkg.originalPrice}</span>
-//                         </div>
-//                         <p className="text-sm text-gray-500">One-time payment</p>
-//                       </div>
-
-//                       {/* Features */}
-//                       <div className="space-y-3 mb-8">
-//                         {pkg.features.map((feature, idx) => (
-//                           <div key={idx} className="flex items-center gap-3">
-//                             <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-//                             <span className="text-gray-700 font-medium text-sm md:text-base">
-//                               {feature}
-//                             </span>
-//                           </div>
-//                         ))}
-//                       </div>
-
-//                       {/* CTA */}
-//                       <Link href={`/services/career-packages#${pkg.id}`}>
-//                         <Button className={`w-full group/btn ${colorClasses[pkg.color]} hover:opacity-90 text-white`}>
-//                           Get Started
-//                           <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-//                         </Button>
-//                       </Link>
-//                     </div>
-//                   </div>
-//                 );
-//               })}
-//             </div>
-//           </div>
-
-//           {/* Career Plans */}
-//           <div className="mb-16 md:mb-20">
-//             <div className="text-center mb-10">
-//               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Career Attainment Program</h3>
-//               <p className="text-gray-600 max-w-2xl mx-auto">
-//                 Comprehensive career programs with guaranteed interview opportunities and flexible payment options
-//               </p>
-//             </div>
-
-//             <div className="grid md:grid-cols-3 gap-6">
-//               {careerPlans.map((plan) => (
-//                 <div 
-//                   key={plan.name}
-//                   className={`bg-white rounded-2xl p-6 border ${plan.popular ? 'border-primary shadow-lg relative' : 'border-gray-200'}`}
-//                 >
-//                   {/* {plan.popular && (
-//                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
-//                       Most Chosen
-//                     </div>
-//                   )} */}
-
-//                   <div className="text-center mb-6">
-//                     <h4 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h4>
-//                     <div className="space-y-2">
-//                       <div>
-//                         <div className="text-2xl font-bold text-gray-900">${plan.price}</div>
-//                         <div className="text-sm text-gray-500">Enrollment Fee</div>
-//                       </div>
-//                       <div className="text-sm text-gray-600">
-//                         + {plan.placementFee} Placement Fee
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   <div className="mb-6">
-//                     <p className="text-gray-700 text-sm text-center mb-3">{plan.features}</p>
-//                     <div className="flex justify-between items-center text-sm">
-//                       <span className="text-gray-600">Flexible Payment:</span>
-//                       <span className="font-semibold">${plan.installment}/month</span>
-//                     </div>
-//                     <div className="text-xs text-gray-500 text-center">
-//                       4 Easy Installments
-//                     </div>
-//                   </div>
-
-//                   <Link href="/services/career-packages#career-plans">
-//                     <Button 
-//                       variant={plan.popular ? 'default' : 'outline'} 
-//                       className={`w-full ${plan.popular ? 'bg-primary hover:bg-primary-700' : 'border-primary text-primary hover:bg-primary-50'}`}
-//                     >
-//                       Learn More
-//                     </Button>
-//                   </Link>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-
-//           {/* Pro Services Quick View */}
-//           <div className="mb-16">
-//             <div className="flex items-center justify-between mb-8">
-//               <div>
-//                 <h3 className="text-2xl md:text-3xl font-bold text-gray-900">À La Carte Pro Services</h3>
-//                 <p className="text-gray-600 mt-2">Individual services for specific career needs</p>
-//               </div>
-//               <Link href="/services/pro-services">
-//                 <Button className="bg-primary hover:bg-primary-700 text-white">
-//                   Browse All Services
-//                   <ArrowRight className="ml-2 h-4 w-4" />
-//                 </Button>
-//               </Link>
-//             </div>
-
-//             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-//               {proServices.map((service, index) => {
-//                 const Icon = service.icon;
-//                 return (
-//                   <div 
-//                     key={index}
-//                     className="group bg-white rounded-xl p-4 border border-gray-200 hover:border-primary hover:shadow-md transition-all"
-//                   >
-//                     <div className="flex items-start justify-between mb-3">
-//                       <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
-//                         <Icon className="h-5 w-5 text-primary" />
-//                       </div>
-//                       <div className="text-lg font-bold text-gray-900">${service.price}</div>
-//                     </div>
-                    
-//                     <h4 className="font-semibold text-gray-900 mb-2">{service.name}</h4>
-//                     <p className="text-sm text-gray-600 mb-4">{service.description}</p>
-                    
-//                     <Link href="/services/pro-services">
-//                       <Button 
-//                         variant="ghost" 
-//                         size="sm" 
-//                         className="w-full text-primary hover:text-primary-700 hover:bg-primary-50"
-//                       >
-//                         Add Service
-//                       </Button>
-//                     </Link>
-//                   </div>
-//                 );
-//               })}
-//             </div>
-//           </div>
-
-//           {/* Benefits & Guarantees */}
-//           <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 md:p-8 text-white">
-//             <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-//               <div className="text-center md:text-left">
-//                 <div className="h-12 w-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-//                   <Shield className="h-6 w-6" />
-//                 </div>
-//                 <h4 className="text-xl text-gray-900  font-bold mb-2">30-Day Money Back Guarantee</h4>
-//                 <p className="text-white/80 text-sm">If you're not satisfied with our services, get a full refund within 30 days.</p>
-//               </div>
-
-//               <div className="text-center md:text-left">
-//                 <div className="h-12 w-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-//                   <Target className="h-6 w-6" />
-//                 </div>
-//                 <h4 className="text-xl text-gray-900 font-bold mb-2">85% Placement Success Rate</h4>
-//                 <p className="text-white/80 text-sm">Our proven methodology delivers results for professionals across industries.</p>
-//               </div>
-
-//               <div className="text-center md:text-left">
-//                 <div className="h-12 w-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-//                   <CreditCard className="h-6 w-6" />
-//                 </div>
-//                 <h4 className="text-xl text-gray-900 font-bold mb-2">Flexible Payment Options</h4>
-//                 <p className="text-white/80 text-sm">Choose from one-time payments or installment plans to fit your budget.</p>
-//               </div>
-//             </div>
-
-//             <div className="text-center mt-8 pt-8 border-t border-white/20">
-//               <div className="inline-flex flex-wrap gap-3 justify-center mb-6">
-//                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full">
-//                   <CheckCircle className="h-3 w-3 text-secondary" />
-//                   <span className="text-xs font-medium">Secure Payment Processing</span>
-//                 </div>
-//                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full">
-//                   <CheckCircle className="h-3 w-3 text-secondary" />
-//                   <span className="text-xs font-medium">24/7 Support</span>
-//                 </div>
-//                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full">
-//                   <CheckCircle className="h-3 w-3 text-secondary" />
-//                   <span className="text-xs font-medium">Certified Career Experts</span>
-//                 </div>
-//               </div>
-
-//               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-//                 <Link href="/services/career-packages">
-//                   <Button size="lg" className="group bg-white text-foreground hover:bg-gray-100 px-4 md:px-6 py-3 text-sm md:text-base font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto">
-//                     Explore All Packages
-//                     <ArrowRight className="ml-2 h-4 w-4" />
-//                   </Button>
-//                 </Link>
-//                 <Link href="/contact#contact-form">
-//                   <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 px-6 py-3">
-//                     Book Free Consultation
-//                   </Button>
-//                 </Link>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <style jsx global>{`
-//         @keyframes float {
-//           0%,
-//           100% {
-//             transform: translateY(0px) rotate(0deg);
-//           }
-//           50% {
-//             transform: translateY(-10px) rotate(180deg);
-//           }
-//         }
-//         @keyframes float-delayed {
-//           0%,
-//           100% {
-//             transform: translateY(0px) rotate(0deg);
-//           }
-//           50% {
-//             transform: translateY(-8px) rotate(180deg);
-//           }
-//         }
-//         .animate-float {
-//           animation: float 6s ease-in-out infinite;
-//         }
-//         .animate-float-delayed {
-//           animation: float-delayed 8s ease-in-out infinite;
-//         }
-//       `}</style>
-//     </section>
-//   );
-// };
-
-// export default PaidServicesSection;
-
 'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  Star, 
-  TrendingUp, 
-  Zap, 
-  Target, 
-  CheckCircle, 
+import {
+  Star,
+  CheckCircle,
   ArrowRight,
-  Shield,
-  Clock,
-  Users,
   Award,
-  Sparkles,
-  Rocket,
   CreditCard,
   Briefcase,
   FileText,
   MessageSquare,
-  BadgeCheck
+  BadgeCheck,
+  Target,
+  ShoppingCart,
+  Zap,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/lib/CartContext';
+import { toast } from 'sonner';
 
 const PaidServicesSection = () => {
   const [hoveredPackage, setHoveredPackage] = useState(null);
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (service, type) => {
+    const serviceWithId = {
+      ...service,
+      id: service.id || service.name.toLowerCase().replace(/\s+/g, '-'),
+      type: type
+    };
+
+    addToCart(serviceWithId);
+    toast.success(`${service.name} added to cart!`, {
+      description: "You've successfully added this service. Check your cart to proceed.",
+      duration: 3000,
+      action: {
+        label: 'View Cart',
+        onClick: () => window.location.href = '/services/cart'
+      },
+    });
+  };
 
   const careerPackages = [
     {
@@ -488,8 +58,7 @@ const PaidServicesSection = () => {
         'Cover Letter Template',
         '30-day Support'
       ],
-    //   badge: 'Most Popular',
-      color: 'primary'  // Changed to 'primary'
+      color: 'blue'
     },
     {
       id: 'interview-edge',
@@ -505,8 +74,8 @@ const PaidServicesSection = () => {
         'Salary Negotiation Strategy',
         '60-day Support'
       ],
-    //   badge: 'Best Value',
-      color: 'primary'  // Changed to 'primary'
+      badge: 'Best Value',
+      color: 'indigo'
     },
     {
       id: 'all-in-one',
@@ -522,8 +91,33 @@ const PaidServicesSection = () => {
         'Priority Job Referrals',
         '90-day Intensive Support'
       ],
-    //   badge: 'Premium',
-      color: 'primary'  // Changed to 'primary'
+      badge: 'Premium',
+      color: 'slate'
+    }
+  ];
+
+  const careerPlans = [
+    {
+      name: 'Basic Plan',
+      price: 2500,
+      placementFee: '15%',
+      features: '10 Interviews, Resume Optimization, AI Marketing',
+      installment: 625
+    },
+    {
+      name: 'Standard Plan',
+      price: 3500,
+      placementFee: '12%',
+      features: '15 Interviews, Mock Interviews, Priority Submissions',
+      installment: 875,
+      popular: true
+    },
+    {
+      name: 'Premium Plan',
+      price: 5000,
+      placementFee: '10%',
+      features: '22 Interviews, Technical Training, VIP Support',
+      installment: 1250
     }
   ];
 
@@ -554,372 +148,241 @@ const PaidServicesSection = () => {
     }
   ];
 
-  const careerPlans = [
-    {
-      name: 'Basic Plan',
-      price: 2500,
-      placementFee: '15%',
-      features: '10 Interviews, Resume Optimization, AI Marketing',
-      installment: 625
-    },
-    {
-      name: 'Standard Plan',
-      price: 3500,
-      placementFee: '12%',
-      features: '15 Interviews, Mock Interviews, Priority Submissions',
-      installment: 875,
-      popular: true
-    },
-    {
-      name: 'Premium Plan',
-      price: 5000,
-      placementFee: '10%',
-      features: '22 Interviews, Technical Training, VIP Support',
-      installment: 1250
-    }
-  ];
-
-  const badgeColorClasses = {
-    primary: 'bg-primary',
-    green: 'bg-green-600',
-    purple: 'bg-purple-600'
-  };
-
   return (
-    <section className="py-12 md:py-20 lg:min-h-[80vh] flex items-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 relative overflow-hidden">
-      
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-40 h-40 md:w-80 md:h-80 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 md:w-80 md:h-80 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl animate-float-delayed"></div>
+    <section className="py-24 bg-[#F8FAFC] relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-100 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-indigo-100 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-8 md:py-16 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          
-          {/* Section Header */}
-          <div className="text-center mb-12 md:mb-16">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-4">
-              <Star className="h-4 w-4 mr-2" />
-              Premium Career Services
-            </div>
-            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              Invest in Your
-              <span className="block text-primary">
-                Career Success
-              </span>
-            </h2>
-            <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto">
-              Professional career services designed to accelerate your job search and maximize your earning potential
-            </p>
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Section Header */}
+        <div className="max-w-3xl mx-auto text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-xs uppercase tracking-widest mb-6 border border-blue-100">
+            <Sparkles className="h-3 w-3" />
+            Premium Career Solutions
           </div>
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
+            Invest in Your <span className="text-blue-600">Career Evolution</span>
+          </h2>
+          <p className="text-lg text-slate-600 leading-relaxed">
+            Choose from our elite selection of career growth packages and professional services designed to maximize your market value and security.
+          </p>
+        </div>
 
-          {/* Career Packages */}
-          <div className="mb-16 md:mb-20">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Career Growth Packages</h3>
-              <Link href="/services/career-packages">
-                <Button variant="ghost" className="text-primary hover:text-primary-700">
-                  View All Packages
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              {careerPackages.map((pkg) => {
-                const Icon = pkg.icon;
-                return (
-                  <div
-                    key={pkg.id}
-                    className="relative group"
-                    onMouseEnter={() => setHoveredPackage(pkg.id)}
-                    onMouseLeave={() => setHoveredPackage(null)}
-                  >
-                    <div className={`absolute inset-0 bg-primary/5 rounded-2xl opacity-5 group-hover:opacity-10 transition-opacity`}></div>
-                    
-                    <div className="relative bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-                      
-                      {pkg.badge && (
-                        <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${badgeColorClasses[pkg.color]} text-white px-4 py-1 rounded-full text-sm font-semibold`}>
-                          {pkg.badge}
-                        </div>
-                      )}
-
-                      {/* Icon */}
-                      <div className="flex justify-center mb-6">
-                        <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
-                          <Icon className="h-8 w-8 text-white" />
-                        </div>
-                      </div>
-
-                      {/* Title & Description */}
-                      <div className="text-center mb-6">
-                        <h4 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{pkg.name}</h4>
-                        <p className="text-gray-600">{pkg.description}</p>
-                      </div>
-
-                      {/* Price */}
-                      <div className="text-center mb-6">
-                        <div className="flex items-center justify-center gap-2 mb-1">
-                          <span className="text-3xl md:text-4xl font-bold text-gray-900">${pkg.price}</span>
-                          <span className="text-gray-400 line-through">${pkg.originalPrice}</span>
-                        </div>
-                        <p className="text-sm text-gray-500">One-time payment</p>
-                      </div>
-
-                      {/* Features */}
-                      <div className="space-y-3 mb-8">
-                        {pkg.features.map((feature, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                            <span className="text-gray-700 font-medium text-sm md:text-base">
-                              {feature}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* CTA */}
-                      <Link href={`/services/career-packages#${pkg.id}`}>
-                        <Button className="w-full group/btn bg-primary hover:bg-primary-700 text-white">
-                          Get Started
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Career Plans */}
-          <div className="mb-16 md:mb-20">
-            <div className="text-center mb-10">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Career Attainment Program</h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Comprehensive career programs with guaranteed interview opportunities and flexible payment options
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {careerPlans.map((plan) => (
-                <div 
-                  key={plan.name}
-                  className={`bg-white rounded-2xl p-6 border ${plan.popular ? 'border-primary shadow-lg relative' : 'border-gray-200'}`}
-                >
-                  {/* {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    </div>
-                  )} */}
-
-                  <div className="text-center mb-6">
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h4>
-                    <div className="space-y-2">
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">${plan.price}</div>
-                        <div className="text-sm text-gray-500">Enrollment Fee</div>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        + {plan.placementFee} Placement Fee
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <p className="text-gray-700 text-sm text-center mb-3">{plan.features}</p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Flexible Payment:</span>
-                      <span className="font-semibold">${plan.installment}/month</span>
-                    </div>
-                    <div className="text-xs text-gray-500 text-center">
-                      4 Easy Installments
-                    </div>
-                  </div>
-
-                  <Link href="/services/career-packages#career-plans">
-                    <Button 
-                      // variant={plan.popular ? 'default' : 'outline'} 
-                      variant={'outline'} 
-                      className={`w-full border-primary text-primary hover:bg-primary/10}`}
-                    >
-                      Learn More
-                    </Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Pro Services Quick View */}
-          <div className="mb-16">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                {/* <h3 className="text-2xl md:text-3xl font-bold text-gray-900">À La Carte Pro Services</h3> */}
-                <p className="text-gray-600 mt-2">Individual services for specific career needs</p>
+        {/* 1. Career Growth Packages */}
+        <div className="mb-24">
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                <Zap className="h-5 w-5 text-white" />
               </div>
-              <Link href="/services/pro-services">
-                <Button className="bg-primary hover:bg-primary-700 text-white mt-2">
-                  Browse All Services
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <h3 className="text-2xl font-bold text-slate-900">Elite Packages</h3>
             </div>
+            <Link href="/services/career-packages">
+              <Button variant="ghost" className="text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1">
+                View All <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {proServices.map((service, index) => {
-                const Icon = service.icon;
-                return (
-                  <div 
-                    key={index}
-                    className="group bg-white rounded-xl p-4 border border-gray-200 hover:border-primary hover:shadow-md transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <Icon className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="text-lg font-bold text-gray-900">${service.price}</div>
+          <div className="grid lg:grid-cols-3 gap-8">
+            {careerPackages.map((pkg, idx) => (
+              <div
+                key={pkg.id}
+                className="group relative transition-all duration-500 hover:-translate-y-1"
+                onMouseEnter={() => setHoveredPackage(pkg.id)}
+                onMouseLeave={() => setHoveredPackage(null)}
+              >
+                <div className="absolute inset-0 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-blue-100 group-hover:border-blue-100" />
+
+                <div className="relative p-8 md:p-10 flex flex-col h-full">
+                  {pkg.badge && (
+                    <div className="absolute -top-3 right-8 px-4 py-1.5 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200">
+                      {pkg.badge}
                     </div>
-                    
-                    <h4 className="font-semibold text-gray-900 mb-2">{service.name}</h4>
-                    <p className="text-sm text-gray-600 mb-4">{service.description}</p>
-                    
-                    <Link href="/services/pro-services">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full border-primary text-primary hover:bg-primary hover:text-white"
-                      >
-                        Add Service
+                  )}
+
+                  <div className="mb-8">
+                    <div className="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                      <pkg.icon className="h-7 w-7 text-blue-600" />
+                    </div>
+                    <h4 className="text-2xl font-black text-slate-900 mb-2">{pkg.name}</h4>
+                    <p className="text-slate-500 text-sm leading-relaxed">{pkg.description}</p>
+                  </div>
+
+                  <div className="mb-8 p-6 rounded-2xl bg-slate-50/50 border border-slate-100">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-4xl font-black text-slate-900">${pkg.price}</span>
+                      <span className="text-slate-400 line-through text-lg">${pkg.originalPrice}</span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Single Investment</p>
+                  </div>
+
+                  <div className="space-y-4 mb-10 flex-1">
+                    {pkg.features.map((feature, fidx) => (
+                      <div key={fidx} className="flex items-center gap-3">
+                        <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0" />
+                        <span className="text-sm font-medium text-slate-600">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col gap-3 pt-6 border-t border-slate-100">
+                    <Button
+                      onClick={() => handleAddToCart(pkg, 'package')}
+                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 gap-2"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Add to Cart
+                    </Button>
+                    <Link href={`/services/career-packages#${pkg.id}`}>
+                      <Button variant="outline" className="w-full h-12 rounded-xl text-slate-700 font-bold border-slate-200 hover:bg-slate-50 gap-2">
+                        Details <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Career Attainment Program */}
+        <div className="mb-24">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-black text-slate-900 mb-4">Career Attainment Program</h3>
+            <p className="text-slate-500">Intensive support with success-based payment structures</p>
           </div>
 
-          {/* Benefits & Guarantees */}
-          <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 md:p-8 text-gray">
-            {/* <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              <div className="text-center md:text-left">
-                <div className="h-12 w-12 bg-gray/20 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-                  <Shield className="h-6 w-6" />
-                </div>
-                <h4 className="text-xl text-gray-900  font-bold mb-2">30-Day Money Back Guarantee</h4>
-                <p className="text-gray/80 text-sm">If you're not satisfied with our services, get a full refund within 30 days.</p>
-              </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {careerPlans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative p-8 rounded-[2rem] border transition-all duration-500 ${plan.popular ? 'bg-white border-blue-600 shadow-2xl ring-4 ring-blue-50' : 'bg-slate-50/50 border-slate-200'
+                  }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    Most Popular Choice
+                  </div>
+                )}
 
-              <div className="text-center md:text-left">
-                <div className="h-12 w-12 bg-gray/20 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-                  <Target className="h-6 w-6" />
+                <div className="text-center mb-8">
+                  <h4 className="text-xl font-black text-slate-900 mb-4">{plan.name}</h4>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-3xl font-black text-slate-900">${plan.price}</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Enrollment Fee</span>
+                  </div>
+                  <div className="mt-2 inline-block px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest">
+                    + {plan.placementFee} Success Fee
+                  </div>
                 </div>
-                <h4 className="text-xl text-gray-900 font-bold mb-2">85% Placement Success Rate</h4>
-                <p className="text-gray/80 text-sm">Our proven methodology delivers results for professionals across industries.</p>
-              </div>
 
-              <div className="text-center md:text-left">
-                <div className="h-12 w-12 bg-gray/20 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-                  <CreditCard className="h-6 w-6" />
+                <div className="mb-8 text-center text-sm font-medium text-slate-600 italic">
+                  {plan.features}
                 </div>
-                <h4 className="text-xl text-gray-900 font-bold mb-2">Flexible Payment Options</h4>
-                <p className="text-gray/80 text-sm">Choose from one-time payments or installment plans to fit your budget.</p>
-              </div>
-            </div> */}
 
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              <div className="text-center md:text-left">
-                <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-                  <Award className="h-6 w-6 text-primary" /> {/* Changed icon */}
+                <div className="mb-8 p-4 rounded-xl bg-white border border-slate-100 text-center">
+                  <p className="text-xs text-slate-400 font-bold mb-1 uppercase tracking-tighter">Flexible installments</p>
+                  <p className="text-lg font-black text-slate-900">${plan.installment} <span className="text-slate-400 font-medium text-sm">/ mo</span></p>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Certified Career Experts</h4>
-                <p className="text-gray-600 text-sm">Our team includes certified career coaches and industry specialists with proven track records.</p>
-              </div>
 
-              <div className="text-center md:text-left">
-                <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-                  <Target className="h-6 w-6 text-primary" />
-                </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">85% Placement Success Rate</h4>
-                <p className="text-gray-600 text-sm">Our proven methodology delivers results for professionals across industries.</p>
-              </div>
-
-              <div className="text-center md:text-left">
-                <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 mx-auto md:mx-0">
-                  <CreditCard className="h-6 w-6 text-primary" />
-                </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Flexible Payment Options</h4>
-                <p className="text-gray-600 text-sm">Choose from one-time payments or installment plans to fit your budget.</p>
-              </div>
-            </div>
-
-            <div className="text-center mt-8 pt-8 border-t border-gray/20">
-              <div className="inline-flex flex-wrap gap-3 justify-center mb-6">
-                <div className="flex items-center gap-2 bg-gray/10 backdrop-blur-sm px-3 py-1 rounded-full">
-                  <CheckCircle className="h-3 w-3 text-gray" />
-                  <span className="text-xs font-medium">Secure Payment Processing</span>
-                </div>
-                <div className="flex items-center gap-2 bg-gray/10 backdrop-blur-sm px-3 py-1 rounded-full">
-                  <CheckCircle className="h-3 w-3 text-gray" />
-                  <span className="text-xs font-medium">24/7 Support</span>
-                </div>
-                <div className="flex items-center gap-2 bg-gray/10 backdrop-blur-sm px-3 py-1 rounded-full">
-                  <CheckCircle className="h-3 w-3 text-gray" />
-                  <span className="text-xs font-medium">Certified Career Experts</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/services/career-packages">
-                  <Button size="lg" className="bg-gray text-gray-900 hover:bg-gray-100 px-6 py-3 font-semibold">
-                    Explore All Packages
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/contact#contact-form">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-gray text-gray hover:bg-gray hover:text-gray-900 px-6 py-3 font-semibold"
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={() => handleAddToCart({
+                      id: `cap-${plan.name.toLowerCase().replace(/\s+/g, '-')}`,
+                      name: plan.name,
+                      price: plan.price,
+                      description: `Career Program: ${plan.name} (Success Fee: ${plan.placementFee})`
+                    }, 'career-plan')}
+                    className={`w-full h-11 rounded-xl font-bold transition-all ${plan.popular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200' : 'bg-slate-900 hover:bg-black text-white'
+                      }`}
                   >
-                    Book Free Consultation
+                    Enroll Now
+                  </Button>
+                  <Link href="/services/career-packages#career-plans">
+                    <Button variant="ghost" className="w-full text-xs font-bold text-slate-400 hover:text-blue-600">
+                      View Full Terms
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. À La Carte - Premium Look */}
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 overflow-hidden relative shadow-2xl">
+            {/* Dark Mode Decor */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]" />
+
+            <div className="relative z-10">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12 pb-8 border-b border-white/5">
+                <div>
+                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">À La Carte Pro Services</h3>
+                  <p className="text-slate-400">Precision tools for specific career obstacles</p>
+                </div>
+                <Link href="/services/pro-services">
+                  <Button className="bg-white hover:bg-slate-100 text-slate-900 font-black rounded-xl px-8 h-12 shadow-xl hover:scale-105 transition-transform">
+                    Browse Full Catalog
                   </Button>
                 </Link>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {proServices.map((service, idx) => (
+                  <div key={idx} className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300">
+                    <div className="h-10 w-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <service.icon className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-bold text-white text-sm whitespace-nowrap">{service.name}</h5>
+                      <span className="text-blue-400 font-black tracking-tighter">${service.price}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-6 leading-relaxed">{service.description}</p>
+                    <Button
+                      onClick={() => handleAddToCart(service, 'pro-service')}
+                      variant="ghost"
+                      className="w-full h-9 rounded-lg border border-white/10 text-white hover:bg-white hover:text-slate-900 text-[10px] font-black uppercase tracking-widest gap-2"
+                    >
+                      <ShoppingCart className="h-3.5 w-3.5" />
+                      Add to Cart
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <style jsx global>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-10px) rotate(180deg);
-          }
-        }
-        @keyframes float-delayed {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-8px) rotate(180deg);
-          }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-float-delayed {
-          animation: float-delayed 8s ease-in-out infinite;
-        }
-      `}</style>
+        {/* Benefits Strip */}
+        <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+          {[
+            { icon: Shield, text: 'Secure Payments', label: 'SSL Encrypted' },
+            { icon: Target, text: '85% Success Rate', label: 'Placement Proof' },
+            { icon: CreditCard, text: 'Flex Payments', label: '0% Interest' },
+            { icon: Sparkles, text: 'VIP Support', label: '24/7 Access' }
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col items-center text-center p-4">
+              <div className="h-10 w-10 text-blue-600 mb-3 opacity-80">
+                {/* Using Icons directly from imports */}
+                <item.icon className="h-full w-full" />
+              </div>
+              <p className="text-slate-900 font-black text-sm tracking-tight">{item.text}</p>
+              <p className="text-xs text-slate-400 uppercase font-bold tracking-tighter mt-1">{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 };
+
+// Simple Shield icon if not available
+const Shield = ({ className }) => <Award className={className} />;
 
 export default PaidServicesSection;

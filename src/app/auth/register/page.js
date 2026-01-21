@@ -182,10 +182,7 @@ function RegisterForm() {
             >
               {loading ? (
                 <div className="flex items-center gap-2">
-                  <div className="relative w-5 h-5">
-                    <Image src="/favicon.ico" alt="Loading" width={20} height={20} className="animate-pulse" />
-                    <div className="absolute inset-0 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  </div>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Creating Account</span>
                 </div>
               ) : (
