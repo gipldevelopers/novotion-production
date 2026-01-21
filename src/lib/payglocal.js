@@ -12,6 +12,7 @@ const PAYGLOCAL_ENV = process.env.PAYGLOCAL_ENV || "uat";
 
 // Set to true to test payment flow without real PayGlocal API
 const MOCK_MODE = false;
+ 
 
 const PAYGLOCAL_GPI_URL =
   PAYGLOCAL_ENV === "prod"
@@ -58,8 +59,16 @@ const ERROR_MESSAGES = {
 
 function getKeys() {
   try {
-    const privateKey = fs.readFileSync(PRIVATE_KEY_PATH, "utf8");
-    const publicKey = fs.readFileSync(PUBLIC_KEY_PATH, "utf8");
+    const privateKeyPath = process.env.PRIVATE_KEY_PATH
+      ? path.resolve(process.cwd(), process.env.PRIVATE_KEY_PATH)
+      : PRIVATE_KEY_PATH;
+
+    const publicKeyPath = process.env.PUBLIC_KEY_PATH
+      ? path.resolve(process.cwd(), process.env.PUBLIC_KEY_PATH)
+      : PUBLIC_KEY_PATH;
+
+    const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+    const publicKey = fs.readFileSync(publicKeyPath, "utf8");
 
     return { privateKey, publicKey };
   } catch (err) {
