@@ -1,13 +1,14 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { XCircle, AlertCircle, Home, RefreshCw, MessageCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Image from 'next/image';
 
-export default function PaymentFailure() {
+function PaymentFailureContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -88,5 +89,22 @@ export default function PaymentFailure() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function PaymentFailure() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="relative flex flex-col items-center gap-4">
+                    <div className="relative w-16 h-16">
+                        <Image src="/favicon.ico" alt="Novotion" width={64} height={64} className="animate-pulse" />
+                        <div className="absolute -inset-4 border-4 border-slate-100 border-t-red-600 rounded-full animate-spin"></div>
+                    </div>
+                </div>
+            </div>
+        }>
+            <PaymentFailureContent />
+        </Suspense>
     );
 }
