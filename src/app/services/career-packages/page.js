@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   CheckCircle,
@@ -21,7 +21,9 @@ import {
   Globe,
   CreditCard,
   ShieldCheck,
-  BadgeCheck
+  BadgeCheck,
+  ShoppingCart,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -43,7 +45,9 @@ const CardContent = ({ children, className = "", ...props }) => (
 
 const CareerPackages = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const { addToCart } = useCart();
+  const checkoutRef = useRef(null);
 
   const packages = [
     {
@@ -116,7 +120,7 @@ const CareerPackages = () => {
         'Quarterly Career Check-ins'
       ],
       highlights: [
-        'Guanteed placement assistance',
+        'Guaranteed placement assistance',
         'Average time-to-offer: 45 days',
         'VIP access to hiring managers'
       ]
@@ -125,6 +129,7 @@ const CareerPackages = () => {
 
   const careerPlans = [
     {
+      id: 'plan-basic',
       name: 'Basic Plan',
       enrollmentFee: 2500,
       placementFee: 15,
@@ -145,6 +150,7 @@ const CareerPackages = () => {
       ]
     },
     {
+      id: 'plan-standard',
       name: 'Standard Plan',
       enrollmentFee: 3500,
       placementFee: 12,
@@ -165,6 +171,7 @@ const CareerPackages = () => {
       ]
     },
     {
+      id: 'plan-advanced',
       name: 'Advanced Plan',
       enrollmentFee: 4000,
       placementFee: 12,
@@ -184,6 +191,7 @@ const CareerPackages = () => {
       ]
     },
     {
+      id: 'plan-premium',
       name: 'Premium Plan',
       enrollmentFee: 5000,
       placementFee: 10,
@@ -209,6 +217,7 @@ const CareerPackages = () => {
 
   const proServices = [
     {
+      id: 'service-resume-pro',
       name: 'Resume Upgrade Pro',
       price: 299,
       description: 'Professional resume rewriting by certified experts',
@@ -222,6 +231,7 @@ const CareerPackages = () => {
       icon: FileText
     },
     {
+      id: 'service-profile-verification',
       name: 'Profile Verification',
       price: 149,
       description: 'Complete profile verification and validation',
@@ -235,6 +245,7 @@ const CareerPackages = () => {
       icon: BadgeCheck
     },
     {
+      id: 'service-linkedin-premium',
       name: 'LinkedIn Premium Optimization',
       price: 199,
       description: 'Executive-level LinkedIn profile enhancement',
@@ -248,6 +259,7 @@ const CareerPackages = () => {
       icon: Briefcase
     },
     {
+      id: 'service-interview-simulation',
       name: 'Interview Simulation Pro',
       price: 349,
       description: 'Real-time interview simulation with feedback',
@@ -264,20 +276,47 @@ const CareerPackages = () => {
 
   const handlePackageSelect = (pkg) => {
     setSelectedPackage(pkg);
-    // Scroll to checkout section
-    document.getElementById('checkout').scrollIntoView({ behavior: 'smooth' });
+    setShowCheckoutModal(true);
   };
 
-  const handlePayment = (type, amount, id) => {
-    addToCart({ id, name: type, price: amount, description: `Package: ${type}` });
-    toast.success(`${type} added to cart!`, {
-      description: "Redirecting to secure payment...",
-      duration: 2000,
+  const handleAddToCart = (item, type) => {
+    const cartItem = {
+      id: item.id,
+      name: item.name,
+      price: item.price || item.total || item.enrollmentFee,
+      description: item.description || `Package: ${item.name}`,
+      type: type
+    };
+    
+    addToCart(cartItem);
+    toast.success(`${item.name} added to cart!`, {
+      description: "You can view it in your cart and proceed to payment.",
+      duration: 3000,
+      action: {
+        label: 'View Cart',
+        onClick: () => window.location.href = '/services/cart'
+      },
     });
+    
+    if (showCheckoutModal) {
+      setShowCheckoutModal(false);
+    }
+  };
+
+  const handleBuyNow = (item, type) => {
+    handleAddToCart(item, type);
+    // Redirect to cart page after a short delay
     setTimeout(() => {
       window.location.href = '/services/payment';
-    }, 1500);
+    }, 1000);
   };
+
+  // Handle checkout modal scroll
+  useEffect(() => {
+    if (showCheckoutModal && checkoutRef.current) {
+      checkoutRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [showCheckoutModal]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30">
@@ -313,9 +352,9 @@ const CareerPackages = () => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/contact#contact-form">
+              <Link href="/services/cart">
                 <Button size="lg" variant="outline" className="group border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-blue-600 px-6 sm:px-8 py-4 sm:py-4 rounded-lg transition-all w-full sm:w-auto text-base sm:text-base font-semibold">
-                  Book Consultation
+                  View Cart
                 </Button>
               </Link>
             </div>
@@ -355,12 +394,22 @@ const CareerPackages = () => {
                       <p className="text-sm text-gray-500">One-time payment</p>
                     </div>
 
-                    <Button
-                      onClick={() => handlePackageSelect(pkg)}
-                      className={`w-full ${selectedPackage?.id === pkg.id ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-900 hover:bg-gray-800'}`}
-                    >
-                      Select Package
-                    </Button>
+                    <div className="space-y-3">
+                      <Button
+                        onClick={() => handleAddToCart(pkg, 'package')}
+                        variant="outline"
+                        className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white gap-2"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        Add to Cart
+                      </Button>
+                      <Button
+                        onClick={() => handlePackageSelect(pkg)}
+                        className={`w-full ${selectedPackage?.id === pkg.id ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-900 hover:bg-gray-800'}`}
+                      >
+                        Select & Checkout
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -403,7 +452,7 @@ const CareerPackages = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {careerPlans.map((plan) => (
-              <Card key={plan.name} className="hover-lift">
+              <Card key={plan.id} className="hover-lift">
                 <CardContent>
                   <div className="text-center mb-6">
                     {plan.badge && (
@@ -444,12 +493,23 @@ const CareerPackages = () => {
                     ))}
                   </ul>
 
-                  <Button
-                    onClick={() => handlePayment(plan.name, plan.total, `plan-${plan.name.toLowerCase().replace(/\s+/g, '-')}`)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700"
-                  >
-                    Enroll Now
-                  </Button>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={() => handleAddToCart(plan, 'career-plan')}
+                      variant="outline"
+                      className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white gap-2"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Add to Cart
+                    </Button>
+                    <Button
+                      onClick={() => handleBuyNow(plan, 'career-plan')}
+                      className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 gap-2"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Enroll Now
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -471,7 +531,7 @@ const CareerPackages = () => {
             {proServices.map((service) => {
               const Icon = service.icon;
               return (
-                <Card key={service.name} className="hover-lift">
+                <Card key={service.id} className="hover-lift">
                   <CardContent className="h-full flex flex-col">
                     <div className="mb-4">
                       <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
@@ -493,13 +553,23 @@ const CareerPackages = () => {
                       </ul>
                     </div>
 
-                    <Button
-                      onClick={() => handlePayment(service.name, service.price, `service-${service.name.toLowerCase().replace(/\s+/g, '-')}`)}
-                      variant="outline"
-                      className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
-                    >
-                      Add to Cart
-                    </Button>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => handleAddToCart(service, 'pro-service')}
+                        variant="outline"
+                        className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white gap-2"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        Add to Cart
+                      </Button>
+                      <Button
+                        onClick={() => handleBuyNow(service, 'pro-service')}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        Buy Now
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -508,84 +578,67 @@ const CareerPackages = () => {
         </div>
       </section>
 
-      {/* Checkout Section */}
-      {selectedPackage && (
-        <section id="checkout" className="py-12 sm:py-16 md:py-20 bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="max-w-2xl mx-auto">
-              <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
-                <CardContent>
-                  <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold mb-2">Complete Your Purchase</h2>
-                    <p className="text-gray-600">You're about to purchase: <span className="font-semibold">{selectedPackage.name}</span></p>
+      {/* Checkout Modal */}
+      {showCheckoutModal && selectedPackage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div ref={checkoutRef} className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <CardContent>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold">Complete Your Purchase</h3>
+                <button
+                  onClick={() => {
+                    setShowCheckoutModal(false);
+                    setSelectedPackage(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold">{selectedPackage.name}</span>
+                    <span className="text-lg font-bold">${selectedPackage.price}</span>
                   </div>
-
-                  <div className="space-y-6">
-                    <div className="bg-white p-4 rounded-lg border">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold">{selectedPackage.name}</span>
-                        <span className="text-lg font-bold">${selectedPackage.price}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">{selectedPackage.description}</p>
-                      <div className="text-xs text-gray-500">
-                        One-time payment • No hidden fees
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Payment Method</h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {['Credit Card', 'PayPal', 'Bank Transfer', 'Crypto'].map((method) => (
-                          <button
-                            key={method}
-                            className="p-3 border rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors text-center"
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              <CreditCard className="h-4 w-4" />
-                              <span>{method}</span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="font-semibold">Total Amount</span>
-                        <span className="text-2xl font-bold text-gray-900">${selectedPackage.price}</span>
-                      </div>
-
-                      <div className="space-y-3">
-                        <Button
-                          onClick={() => handlePayment(selectedPackage.name, selectedPackage.price, selectedPackage.id)}
-                          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 py-3"
-                        >
-                          <ShieldCheck className="mr-2 h-5 w-5" />
-                          Proceed to Secure Payment
-                        </Button>
-
-                        <Button
-                          onClick={() => setSelectedPackage(null)}
-                          variant="ghost"
-                          className="w-full text-gray-600 hover:text-gray-800"
-                        >
-                          Choose Different Package
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="text-xs text-gray-500 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <Shield className="h-3 w-3" />
-                        Secure payment
-                      </div>
-                    </div>
+                  <p className="text-sm text-gray-600 mb-3">{selectedPackage.description}</p>
+                  <div className="text-xs text-gray-500">
+                    One-time payment • No hidden fees
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Choose Action</h3>
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => handleAddToCart(selectedPackage, 'package')}
+                      variant="outline"
+                      className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white gap-2"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Add to Cart & Continue Shopping
+                    </Button>
+                    <Button
+                      onClick={() => handleBuyNow(selectedPackage, 'package')}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 py-3 gap-2"
+                    >
+                      <CreditCard className="h-5 w-5" />
+                      Checkout Now
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                    <ShieldCheck className="h-4 w-4 text-green-600" />
+                    Secure payment • 30-day money-back guarantee
+                  </div>
+                </div>
+              </div>
+            </CardContent>
           </div>
-        </section>
+        </div>
       )}
 
       {/* CTA Section */}
@@ -608,14 +661,14 @@ const CareerPackages = () => {
                   Book Free Consultation
                 </Button>
               </Link>
-              <Link href="mailto:info@novotionservices.com">
+              <Link href="/services/cart">
                 <Button
                   size="lg"
                   variant="outline"
                   className="group border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-blue-600 px-4 sm:px-6 py-3 rounded-lg transition-all w-full sm:w-auto text-sm sm:text-base"
                 >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Ask Questions
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  View Cart
                 </Button>
               </Link>
             </div>
