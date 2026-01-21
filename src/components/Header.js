@@ -46,23 +46,22 @@
 //         border-b border-gray-200`}
 //     >
 //       <nav className="container mx-auto px-4 sm:px-6">
-//         <div className="flex h-20 items-center justify-between">
+//         <div className="flex h-20 items-center justify-between relative">
 
-//           {/* Logo */}
-//           {/* <Link href="/" className="flex items-center">
-//             <div className="relative">
-//               <Image
-//                 src="/logo/novotion.png"
-//                 alt="Novotion Logo"
-//                 width={110}
-//                 height={60}
-//                 className="object-contain"
-//                 priority
-//               />
-//             </div>
-//           </Link> */}
+//           {/* Mobile Menu Button - Positioned absolutely on left */}
+//           <button
+//             className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition absolute left-0"
+//             onClick={() => setIsOpen(!isOpen)}
+//             aria-label="Toggle menu"
+//           >
+//             {isOpen ? <X className="h-6 w-6 text-gray-700" /> : <Menu className="h-6 w-6 text-gray-700" />}
+//           </button>
 
-//              <Link href="/" className="flex items-center group">
+//           {/* Logo - Centered on mobile, left on desktop */}
+//           <Link 
+//             href="/" 
+//             className="flex items-center group lg:mx-0 mx-auto lg:absolute lg:left-0"
+//           >
 //             <div className="relative">
 //               <div className="w-50 h-50 bg-transparent rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
 //                 <Image
@@ -74,12 +73,11 @@
 //                   priority
 //                 />
 //               </div>
-//               {/* <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 -z-10 blur-sm"></div> */}
 //             </div>
 //           </Link>
 
 //           {/* Desktop Navigation */}
-//           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+//           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8 mx-auto">
 //             {navItems.map((item) => (
 //               <div key={item.label} className="relative group">
 //                 {item.children ? (
@@ -129,7 +127,7 @@
 //           </div>
 
 //           {/* Desktop CTA */}
-//           <div className="hidden lg:flex items-center space-x-4">
+//           <div className="hidden lg:flex items-center space-x-4 absolute right-0">
 //             <div className="flex items-center space-x-2 text-sm text-gray-700">
 //               <Phone className="h-4 w-4 text-secondary" />
 //               <span>+1 (786) 652-3950</span>
@@ -144,21 +142,11 @@
 //               </Button>
 //             </Link>
 //           </div>
-
-//           {/* Mobile Menu Icon */}
-//           <button
-//             className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
-//             onClick={() => setIsOpen(!isOpen)}
-//             aria-label="Toggle menu"
-//           >
-//             {isOpen ? <X className="h-6 w-6 text-gray-700" /> : <Menu className="h-6 w-6 text-gray-700" />}
-//           </button>
 //         </div>
 
 //         {/* Mobile Navigation */}
 //         {isOpen && (
 //           <div className="lg:hidden py-4 space-y-2 border-t border-gray-200 bg-white animate-fade-in-up">
-
 //             {navItems.map((item) => (
 //               <div key={item.label}>
 //                 {item.children ? (
@@ -223,20 +211,21 @@
 
 // export default Header;
 
-
-// src/components/Header.js
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown, Phone } from 'lucide-react';
+import { Menu, X, ChevronDown, Phone, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/lib/CartContext';
 import Image from 'next/image';
 
 const Header = () => {
+  const { cart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [paidServicesOpen, setPaidServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
@@ -257,7 +246,9 @@ const Header = () => {
       label: 'Services',
       children: [
         { href: '/services/rpo', label: 'Recruitment Process Outsourcing' },
-        { href: '/services/career-support', label: 'Career Support Services' }
+        { href: '/services/career-support', label: 'Career Support Services' },
+        { href: '/services/career-packages', label: 'Career Growth Packages' },
+        { href: '/services/pro-services', label: 'Pro Services' }
       ]
     },
     { href: '/blog', label: 'Blog' },
@@ -274,7 +265,7 @@ const Header = () => {
       <nav className="container mx-auto px-4 sm:px-6">
         <div className="flex h-20 items-center justify-between relative">
 
-          {/* Mobile Menu Button - Positioned absolutely on left */}
+          {/* Mobile Menu Button */}
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition absolute left-0"
             onClick={() => setIsOpen(!isOpen)}
@@ -283,9 +274,9 @@ const Header = () => {
             {isOpen ? <X className="h-6 w-6 text-gray-700" /> : <Menu className="h-6 w-6 text-gray-700" />}
           </button>
 
-          {/* Logo - Centered on mobile, left on desktop */}
-          <Link 
-            href="/" 
+          {/* Logo */}
+          <Link
+            href="/"
             className="flex items-center group lg:mx-0 mx-auto lg:absolute lg:left-0"
           >
             <div className="relative">
@@ -359,6 +350,15 @@ const Header = () => {
               <span>+1 (786) 652-3950</span>
             </div>
 
+            <Link href="/services/cart" className="relative p-2 text-gray-700 hover:text-primary transition-colors">
+              <ShoppingBag className="h-6 w-6" />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 h-4 w-4 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {cart.length}
+                </span>
+              )}
+            </Link>
+
             <Link href="/contact#contact-form">
               <Button
                 size="sm"
@@ -417,9 +417,20 @@ const Header = () => {
 
             {/* Mobile CTA */}
             <div className="pt-4 border-t border-gray-200 space-y-3">
-              <div className="flex items-center space-x-2 text-sm text-gray-700 pb-2">
-                <Phone className="h-4 w-4 text-secondary" />
-                <span>+1 (786) 652-3950</span>
+              <div className="flex items-center justify-between pb-2">
+                <div className="flex items-center space-x-2 text-sm text-gray-700">
+                  <Phone className="h-4 w-4 text-secondary" />
+                  <span>+1 (786) 652-3950</span>
+                </div>
+
+                <Link href="/services/cart" onClick={() => setIsOpen(false)} className="relative p-2 text-gray-700 hover:text-primary transition-colors">
+                  <ShoppingBag className="h-6 w-6" />
+                  {cart.length > 0 && (
+                    <span className="absolute top-0 right-0 h-4 w-4 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {cart.length}
+                    </span>
+                  )}
+                </Link>
               </div>
 
               <Link href="/contact#contact-form" onClick={() => setIsOpen(false)}>

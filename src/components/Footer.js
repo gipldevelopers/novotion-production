@@ -107,6 +107,14 @@ const Footer = () => {
                 { href: '/services/career-support', label: 'Career Support Services' },
                 { href: '/services/rpo#services', label: 'Our RPO Service Model' },
                 { href: '/services/career-support#services', label: 'Our Career Approach' },
+                {
+  href: '/services/career-packages', 
+  label: 'Career Growth Packages' 
+},
+{
+  href: '/services/pro-services', 
+  label: 'Pro Services' 
+},
               ].map((service, index) => (
                 <li key={index}>
                   <Link
