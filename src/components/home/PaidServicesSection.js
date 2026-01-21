@@ -139,7 +139,7 @@
 
 //   return (
 //     <section className="py-12 md:py-20 lg:min-h-[80vh] flex items-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 relative overflow-hidden">
-
+      
 //       {/* Background Elements */}
 //       <div className="absolute inset-0">
 //         <div className="absolute top-0 right-0 w-40 h-40 md:w-80 md:h-80 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
@@ -148,7 +148,7 @@
 
 //       <div className="container mx-auto px-4 md:px-6 py-8 md:py-16 relative z-10">
 //         <div className="max-w-6xl mx-auto">
-
+          
 //           {/* Section Header */}
 //           <div className="text-center mb-12 md:mb-16">
 //             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 text-primary font-medium mb-4">
@@ -189,9 +189,9 @@
 //                     onMouseLeave={() => setHoveredPackage(null)}
 //                   >
 //                     <div className={`absolute inset-0 ${colorClasses[pkg.color]} rounded-2xl opacity-5 group-hover:opacity-10 transition-opacity`}></div>
-
+                    
 //                     <div className="relative bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-
+                      
 //                       {pkg.badge && (
 //                         <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${colorClasses[pkg.color]} text-white px-4 py-1 rounded-full text-sm font-semibold`}>
 //                           {pkg.badge}
@@ -333,10 +333,10 @@
 //                       </div>
 //                       <div className="text-lg font-bold text-gray-900">${service.price}</div>
 //                     </div>
-
+                    
 //                     <h4 className="font-semibold text-gray-900 mb-2">{service.name}</h4>
 //                     <p className="text-sm text-gray-600 mb-4">{service.description}</p>
-
+                    
 //                     <Link href="/services/pro-services">
 //                       <Button 
 //                         variant="ghost" 
@@ -444,15 +444,17 @@
 //   );
 // };
 
+// export default PaidServicesSection;
+
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import {
-  Star,
-  TrendingUp,
-  Zap,
-  Target,
-  CheckCircle,
+import { 
+  Star, 
+  TrendingUp, 
+  Zap, 
+  Target, 
+  CheckCircle, 
   ArrowRight,
   Shield,
   Clock,
@@ -467,8 +469,6 @@ import {
   BadgeCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/lib/CartContext';
-import { toast } from 'sonner';
 
 const PaidServicesSection = () => {
   const [hoveredPackage, setHoveredPackage] = useState(null);
@@ -488,7 +488,7 @@ const PaidServicesSection = () => {
         'Cover Letter Template',
         '30-day Support'
       ],
-      //   badge: 'Most Popular',
+    //   badge: 'Most Popular',
       color: 'primary'  // Changed to 'primary'
     },
     {
@@ -505,7 +505,7 @@ const PaidServicesSection = () => {
         'Salary Negotiation Strategy',
         '60-day Support'
       ],
-      //   badge: 'Best Value',
+    //   badge: 'Best Value',
       color: 'primary'  // Changed to 'primary'
     },
     {
@@ -522,7 +522,7 @@ const PaidServicesSection = () => {
         'Priority Job Referrals',
         '90-day Intensive Support'
       ],
-      //   badge: 'Premium',
+    //   badge: 'Premium',
       color: 'primary'  // Changed to 'primary'
     }
   ];
@@ -585,29 +585,9 @@ const PaidServicesSection = () => {
     purple: 'bg-purple-600'
   };
 
-  const { addToCart } = useCart();
-
-  const handleAddToCart = (service) => {
-    // Generate an ID if it's missing (for proServices)
-    const serviceWithId = {
-      ...service,
-      id: service.id || service.name.toLowerCase().replace(/\s+/g, '-')
-    };
-
-    addToCart(serviceWithId);
-    toast.success(`${service.name} added to cart!`, {
-      description: "You can view it in your cart and proceed to payment.",
-      duration: 3000,
-      action: {
-        label: 'View Cart',
-        onClick: () => window.location.href = '/services/cart'
-      },
-    });
-  };
-
   return (
     <section className="py-12 md:py-20 lg:min-h-[80vh] flex items-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 relative overflow-hidden">
-
+      
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 right-0 w-40 h-40 md:w-80 md:h-80 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
@@ -616,7 +596,7 @@ const PaidServicesSection = () => {
 
       <div className="container mx-auto px-4 md:px-6 py-8 md:py-16 relative z-10">
         <div className="max-w-6xl mx-auto">
-
+          
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-4">
@@ -657,9 +637,9 @@ const PaidServicesSection = () => {
                     onMouseLeave={() => setHoveredPackage(null)}
                   >
                     <div className={`absolute inset-0 bg-primary/5 rounded-2xl opacity-5 group-hover:opacity-10 transition-opacity`}></div>
-
+                    
                     <div className="relative bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-
+                      
                       {pkg.badge && (
                         <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${badgeColorClasses[pkg.color]} text-white px-4 py-1 rounded-full text-sm font-semibold`}>
                           {pkg.badge}
@@ -701,20 +681,12 @@ const PaidServicesSection = () => {
                       </div>
 
                       {/* CTA */}
-                      <div className="flex flex-col gap-3">
-                        <Button
-                          onClick={() => handleAddToCart({ ...pkg, type: 'package' })}
-                          className="w-full group/btn bg-primary hover:bg-primary-700 text-white"
-                        >
-                          Add to Cart
+                      <Link href={`/services/career-packages#${pkg.id}`}>
+                        <Button className="w-full group/btn bg-primary hover:bg-primary-700 text-white">
+                          Get Started
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
-                        <Link href={`/services/career-packages#${pkg.id}`} className="w-full">
-                          <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/5">
-                            Learn More
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                        </Link>
-                      </div>
+                      </Link>
                     </div>
                   </div>
                 );
@@ -733,7 +705,7 @@ const PaidServicesSection = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
               {careerPlans.map((plan) => (
-                <div
+                <div 
                   key={plan.name}
                   className={`bg-white rounded-2xl p-6 border ${plan.popular ? 'border-primary shadow-lg relative' : 'border-gray-200'}`}
                 >
@@ -766,26 +738,15 @@ const PaidServicesSection = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      onClick={() => handleAddToCart({
-                        id: plan.name.toLowerCase().replace(/\s+/g, '-'),
-                        name: plan.name,
-                        price: plan.price,
-                        description: `Career Plan: ${plan.name} (${plan.placementFee} placement fee)`,
-                        type: 'career-plan'
-                      })}
-                      variant="outline"
-                      className={`w-full border-primary text-primary hover:bg-primary/10`}
+                  <Link href="/services/career-packages#career-plans">
+                    <Button 
+                      // variant={plan.popular ? 'default' : 'outline'} 
+                      variant={'outline'} 
+                      className={`w-full border-primary text-primary hover:bg-primary/10}`}
                     >
-                      Add to Cart
+                      Learn More
                     </Button>
-                    <Link href="/services/career-packages#career-plans" className="w-full">
-                      <Button className="w-full bg-primary hover:bg-primary-700 text-white">
-                        Enroll Now
-                      </Button>
-                    </Link>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -810,7 +771,7 @@ const PaidServicesSection = () => {
               {proServices.map((service, index) => {
                 const Icon = service.icon;
                 return (
-                  <div
+                  <div 
                     key={index}
                     className="group bg-white rounded-xl p-4 border border-gray-200 hover:border-primary hover:shadow-md transition-all"
                   >
@@ -820,25 +781,19 @@ const PaidServicesSection = () => {
                       </div>
                       <div className="text-lg font-bold text-gray-900">${service.price}</div>
                     </div>
-
+                    
                     <h4 className="font-semibold text-gray-900 mb-2">{service.name}</h4>
                     <p className="text-sm text-gray-600 mb-4">{service.description}</p>
-
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        onClick={() => handleAddToCart({ ...service, type: 'pro-service' })}
-                        variant="outline"
-                        size="sm"
+                    
+                    <Link href="/services/pro-services">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
                         className="w-full border-primary text-primary hover:bg-primary hover:text-white"
                       >
-                        Add to Cart
+                        Add Service
                       </Button>
-                      <Link href="/services/pro-services" className="w-full">
-                        <Button variant="ghost" size="sm" className="w-full text-[10px] text-gray-400">
-                          Details
-                        </Button>
-                      </Link>
-                    </div>
+                    </Link>
                   </div>
                 );
               })}
@@ -923,9 +878,9 @@ const PaidServicesSection = () => {
                   </Button>
                 </Link>
                 <Link href="/contact#contact-form">
-                  <Button
-                    size="lg"
-                    variant="outline"
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
                     className="border-gray text-gray hover:bg-gray hover:text-gray-900 px-6 py-3 font-semibold"
                   >
                     Book Free Consultation
