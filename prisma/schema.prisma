@@ -10,10 +10,59 @@ datasource db {
 }
 
 model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  image         String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  payments      Payment[]
+  purchases     Purchase[]
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  orderId       String   @unique // PayGlocal orderId
+  amount        Float
+  currency      String   @default("USD")
+  status        String   // PENDING, SUCCESS, FAILED
+  provider      String   @default("PAYGLOCAL")
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  metadata      Json?    // Store raw response from provider
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Purchase {
   id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  itemId    String   // ID of the service/item
+  itemName  String   // Name of the service
+  itemPrice Float
+  type      String?  // SERVICE, CAREER_PACKAGE, etc.
+  status    String   @default("ACTIVE")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model ContactMessage {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  phone     String?
+  company   String?
+  userType  String?
+  message   String
+  status    String   @default("UNREAD") // UNREAD, READ, REPLIED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

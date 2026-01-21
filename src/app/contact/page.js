@@ -2,14 +2,14 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  Mail, 
-  MapPin, 
-  Phone, 
-  Send, 
-  CheckCircle, 
-  Clock, 
-  Users, 
+import {
+  Mail,
+  MapPin,
+  Phone,
+  Send,
+  CheckCircle,
+  Clock,
+  Users,
   Globe,
   Sparkles,
   Rocket,
@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ReactCountryFlag from 'react-country-flag';
+import { toast } from "sonner";
 
 // Enhanced Card components
 const Card = ({ children, className = "", ...props }) => (
@@ -187,31 +188,43 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.agreedToTerms) {
-      alert('Please agree to the Privacy Policy and Terms of Service.');
+      toast.error('Please agree to the Privacy Policy and Terms of Service.');
       return;
     }
 
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    
-    // Reset form after success
-    setFormData({
-      fullName: '',
-      email: '',
-      phone: '',
-      company: '',
-      userType: '',
-      message: '',
-      agreedToTerms: false
-    });
 
-    // Reset success message after 5 seconds
-    setTimeout(() => setIsSubmitted(false), 5000);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to send message");
+      } else {
+        toast.success("Message sent successfully!");
+        setIsSubmitted(true);
+
+        // Reset form
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          company: '',
+          userType: '',
+          message: '',
+          agreedToTerms: false
+        });
+      }
+    } catch (err) {
+      toast.error("An expected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field, value) => {
@@ -224,7 +237,7 @@ const Contact = () => {
 
       {/* Enhanced Hero Section - Mobile First */}
       <section className="relative min-h-[70vh] sm:min-h-[60vh] md:min-h-[70vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pt-20 md:pt-24">
-        
+
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-96 md:h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
@@ -234,7 +247,7 @@ const Contact = () => {
 
         <div className="relative container mx-auto px-4 sm:px-6 text-center space-y-6 sm:space-y-8">
           <div className="space-y-6 sm:space-y-8">
-            
+
             {/* Badge - Fixed positioning for mobile */}
             <div className="inline-flex items-center justify-center bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-3 mb-2 sm:mb-4 md:mb-6 shadow-2xl">
               <div className="flex items-center gap-2">
@@ -369,9 +382,9 @@ const Contact = () => {
                   <p className="text-green-700 mb-4">
                     Thank you for contacting Novotion. We'll get back to you within 24 hours.
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => setIsSubmitted(false)}
-                    variant="outline" 
+                    variant="outline"
                     className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                   >
                     Send Another Message
@@ -441,9 +454,9 @@ const Contact = () => {
                       label="I have read and agree to the Novotion Privacy Policy and Terms of Service."
                     />
 
-                    <Button 
-                      type="submit" 
-                      size="lg" 
+                    <Button
+                      type="submit"
+                      size="lg"
                       className="group w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all font-semibold"
                       disabled={isSubmitting}
                     >
@@ -576,8 +589,8 @@ const Contact = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link href="/contact#contact-form">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="group bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all"
                 >
                   <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -585,9 +598,9 @@ const Contact = () => {
                 </Button>
               </Link>
               <Link href="mailto:info@novotionservices.com">
-                <Button 
-                  size="lg" 
-                  variant="outline" 
+                <Button
+                  size="lg"
+                  variant="outline"
                   className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg hover:shadow-lg transition-all font-semibold"
                 >
                   <Mail className="mr-2 h-5 w-5" />

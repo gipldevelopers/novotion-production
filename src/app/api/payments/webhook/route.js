@@ -1,24 +1,110 @@
 import { NextResponse } from "next/server";
-
-// Basic webhook receiver for PayGlocal notifications (e.g., SI Auto Debit).
-// Verify signature / payload as per the integration guide before trusting data.
+import prisma from "@/lib/prisma";
 
 export async function POST(request) {
   try {
-    const payload = await request.json();
+    let payload;
+    const contentType = request.headers.get("content-type") || "";
+    const acceptHeader = request.headers.get("accept") || "";
+    const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
 
-    // TODO: verify PayGlocal signature using their public certificate and
-    // persist transaction status in your database.
-    // The integration PDF describes webhook fields such as:
-    // GID, SI ID, status, type, statusUrl, etc.
+    if (contentType.includes("application/json")) {
+      payload = await request.json();
+    } else {
+      try {
+        const formData = await request.formData();
+        payload = Object.fromEntries(formData.entries());
+      } catch (e) {
+        const text = await request.text();
+        const params = new URLSearchParams(text);
+        payload = Object.fromEntries(params.entries());
+      }
+    }
 
-    // For now, just log and acknowledge.
-    // eslint-disable-next-line no-console
-    console.log("Received PayGlocal webhook", payload);
+    const xGlToken = payload['x-gl-token'];
+    let decoded = null;
+
+    if (xGlToken) {
+      const parts = xGlToken.split('.');
+      if (parts.length >= 2) {
+        const base64urlToBase64 = (str) => {
+          const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+          return b64.padEnd(Math.ceil(b64.length / 4) * 4, '=');
+        };
+        const payloadJson = Buffer.from(base64urlToBase64(parts[1]), 'base64').toString('utf8');
+        decoded = JSON.parse(payloadJson);
+        console.log("[PayGlocal Webhook] Decoded Token Status:", decoded.status);
+      }
+    }
+
+    if (decoded) {
+      const gid = decoded.gid || decoded['x-gl-gid'];
+      const status = decoded.status;
+
+      // Find payment in database
+      const payment = await prisma.payment.findUnique({
+        where: { orderId: gid },
+        include: { user: true }
+      });
+
+      if (payment && payment.status === 'PENDING') {
+        const isSuccess = ['SENT_FOR_CAPTURE', 'SUCCESS', 'COMPLETED'].includes(status);
+
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: {
+            status: isSuccess ? 'SUCCESS' : 'FAILED',
+            metadata: {
+              ... (payment.metadata || {}),
+              webhookRaw: decoded
+            }
+          }
+        });
+
+        if (isSuccess) {
+          // Record the purchases if not already done
+          const existingPurchases = await prisma.purchase.findFirst({
+            where: { userId: payment.userId, createdAt: { gte: payment.createdAt } }
+          });
+
+          if (!existingPurchases) {
+            const cart = payment.metadata?.cart || [];
+            for (const item of cart) {
+              await prisma.purchase.create({
+                data: {
+                  userId: payment.userId,
+                  itemId: String(item.id),
+                  itemName: item.name,
+                  itemPrice: item.price,
+                  type: item.type || 'SERVICE',
+                  status: 'ACTIVE'
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Redirect or respond
+    if (acceptHeader.includes("text/html") && decoded) {
+      const isSuccess = decoded.status === 'SENT_FOR_CAPTURE' || decoded.status === 'SUCCESS' || decoded.status === 'COMPLETED';
+      if (isSuccess) {
+        const queryParams = new URLSearchParams({
+          txnId: decoded.merchantTxnId || 'N/A',
+          amount: decoded.totalAmount || decoded.amount || decoded.Amount || 'N/A',
+          status: decoded.status,
+          gid: decoded.gid || 'N/A'
+        });
+        return NextResponse.redirect(`${origin}/services/payment/success?${queryParams.toString()}`);
+      } else {
+        const reason = decoded.failureReason || decoded.message || `Payment status: ${decoded.status}`;
+        return NextResponse.redirect(`${origin}/services/payment/failure?reason=${encodeURIComponent(reason)}&txnId=${decoded.merchantTxnId || 'N/A'}`);
+      }
+    }
 
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error handling PayGlocal webhook", error);
     return NextResponse.json(
       { error: "Invalid webhook payload" },

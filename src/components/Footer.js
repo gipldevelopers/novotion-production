@@ -1,3 +1,4 @@
+"use client";
 // src/components/Footer.js
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,7 +19,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white relative overflow-hidden">
-      
+
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -31,9 +32,9 @@ const Footer = () => {
       </div>
 
       <div className="relative container mx-auto px-4 sm:px-6 py-12 md:py-16">
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 mb-12">
-          
+
           {/* Company */}
           <div className="lg:col-span-1 text-center md:text-left">
             <Link href="/" className="flex items-center group justify-center md:justify-start mb-6">
@@ -108,13 +109,13 @@ const Footer = () => {
                 { href: '/services/rpo#services', label: 'Our RPO Service Model' },
                 { href: '/services/career-support#services', label: 'Our Career Approach' },
                 {
-  href: '/services/career-packages', 
-  label: 'Career Growth Packages' 
-},
-{
-  href: '/services/pro-services', 
-  label: 'Pro Services' 
-},
+                  href: '/services/career-packages',
+                  label: 'Career Growth Packages'
+                },
+                {
+                  href: '/services/pro-services',
+                  label: 'Pro Services'
+                },
               ].map((service, index) => (
                 <li key={index}>
                   <Link
@@ -169,8 +170,8 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 justify-center md:justify-start">
                 <Mail className="h-5 w-5 text-primary mt-0.5" />
-                <a 
-                  href="mailto:info@novotionservices.com" 
+                <a
+                  href="mailto:info@novotionservices.com"
                   className="text-gray-400 hover:text-primary text-sm transition-colors"
                 >
                   info@novotionservices.com
@@ -212,16 +213,16 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            
+
             <div className="text-gray-400 text-center md:text-left text-sm">
               <p className="mb-1">Copyright © 2025 Novotion. All Rights Reserved.</p>
               <p className="text-xs md:text-sm">Strategic Recruitment Solutions & IT Career Support Services</p>
               <div className="mt-2">
                 <p className="text-xs text-gray-500">
                   Powered by{' '}
-                  <a 
-                    href="https://gohilinfotech.com/" 
-                    target="_blank" 
+                  <a
+                    href="https://gohilinfotech.com/"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-primary transition-colors underline"
                   >

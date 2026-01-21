@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShieldCheck,
   CheckCircle2,
@@ -9,7 +10,9 @@ import {
   Lock,
   Plus,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -43,7 +46,7 @@ const InputField = React.memo(({
   ...props
 }) => {
   const inputRef = useRef(null);
-  
+
   // Focus on mount if autoFocus is true
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -65,11 +68,10 @@ const InputField = React.memo(({
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
-        className={`w-full h-11 px-4 rounded-lg border ${
-          error && touched
-            ? "border-red-300 bg-red-50 focus:border-red-500" 
-            : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
-        } focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors text-base placeholder-gray-400`}
+        className={`w-full h-11 px-4 rounded-lg border ${error && touched
+          ? "border-red-300 bg-red-50 focus:border-red-500"
+          : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
+          } focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors text-base placeholder-gray-400`}
         aria-invalid={!!error && touched}
         aria-describedby={error && touched ? `${name}-error` : undefined}
         {...props}
@@ -87,16 +89,19 @@ InputField.displayName = "InputField";
 
 const PaymentPage = () => {
   const { cart, getCartTotal, clearCart, isLoaded } = useCart();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const total = getCartTotal();
-  
+
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [showSavedAddresses, setShowSavedAddresses] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  
-  // Form state with individual fields to prevent whole form re-renders
-  const [formData, setFormData] = useState(() => ({
+
+  // Form state
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -105,50 +110,79 @@ const PaymentPage = () => {
     city: "",
     state: "",
     postalCode: "",
-    country: "IN",
+    country: "US", // Default to US for international feel
     addressType: "home",
     saveAddress: true,
-  }));
+  });
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  
-  // Individual field change handlers to prevent re-rendering all fields
+
+  // Fetch user info and pre-fill form
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          setFormData(prev => ({
+            ...prev,
+            firstName: data.user.name?.split(" ")[0] || "",
+            lastName: data.user.name?.split(" ").slice(1).join(" ") || "",
+            email: data.user.email || "",
+            phone: data.user.phone || "",
+            address: data.user.address || "",
+            city: data.user.city || "",
+            state: data.user.state || "",
+            postalCode: data.user.postalCode || "",
+            country: data.user.country || "US",
+          }));
+        } else {
+          // Redirect to login if not authenticated
+          router.push("/auth/login?callbackUrl=/services/payment");
+        }
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+        router.push("/auth/login?callbackUrl=/services/payment");
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+    fetchUser();
+  }, [router]);
+
+  // Individual field change handlers
   const createInputChangeHandler = useCallback((fieldName) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    
+
     setFormData(prev => ({
       ...prev,
       [fieldName]: value
     }));
-    
-    // Clear error for this field
+
     if (errors[fieldName]) {
       setErrors(prev => ({ ...prev, [fieldName]: "" }));
     }
   }, [errors]);
 
-  // Handle blur for individual field
   const createBlurHandler = useCallback((fieldName) => () => {
     setTouched(prev => ({ ...prev, [fieldName]: true }));
   }, []);
 
-  // Phone input handler
   const handlePhoneChange = useCallback((e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    const value = e.target.value.replace(/[^\d+]/g, "").slice(0, 15);
     setFormData(prev => ({ ...prev, phone: value }));
-    
+
     if (errors.phone) {
       setErrors(prev => ({ ...prev, phone: "" }));
     }
   }, [errors.phone]);
 
-  // Address type change handler
   const handleAddressTypeChange = useCallback((e) => {
     setFormData(prev => ({ ...prev, addressType: e.target.value }));
   }, []);
 
-  // Country change handler
   const handleCountryChange = useCallback((e) => {
     setFormData(prev => ({ ...prev, country: e.target.value }));
   }, []);
@@ -160,9 +194,9 @@ const PaymentPage = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         setSavedAddresses(parsed);
-        
-        // Auto-select first saved address if available
-        if (parsed.length > 0 && !isAddingNew) {
+
+        // Auto-select first saved address if available and user not found
+        if (parsed.length > 0 && !isAddingNew && !user) {
           const firstAddress = parsed[0];
           setFormData({
             ...firstAddress,
@@ -173,16 +207,14 @@ const PaymentPage = () => {
     } catch (error) {
       console.error("Error loading saved addresses:", error);
     }
-  }, [isAddingNew]);
+  }, [isAddingNew, user]);
 
-  // Save addresses whenever they change
   useEffect(() => {
     if (savedAddresses.length > 0) {
       localStorage.setItem(SAVED_ADDRESSES_KEY, JSON.stringify(savedAddresses));
     }
   }, [savedAddresses]);
 
-  // Select saved address
   const handleSelectAddress = useCallback((address) => {
     setFormData({
       ...address,
@@ -192,29 +224,26 @@ const PaymentPage = () => {
     setIsAddingNew(false);
   }, []);
 
-  // Add new address
   const handleAddNewAddress = useCallback(() => {
     setFormData({
       firstName: "",
       lastName: "",
-      email: "",
+      email: user?.email || "",
       phone: "",
       address: "",
       city: "",
       state: "",
       postalCode: "",
-      country: "IN",
+      country: "US",
       addressType: "home",
       saveAddress: true,
     });
     setIsAddingNew(true);
     setShowSavedAddresses(false);
-  }, []);
+  }, [user]);
 
-  // Save current address
   const handleSaveAddress = useCallback(() => {
     if (!validateForm()) {
-      toast.error("Please fill all required fields correctly");
       return;
     }
 
@@ -226,38 +255,29 @@ const PaymentPage = () => {
     };
 
     setSavedAddresses(prev => {
-      // Remove if exists (update)
-      const filtered = prev.filter(addr => addr.id !== newAddress.id);
+      const filtered = prev.filter(addr => addr.email !== newAddress.email || addr.address !== newAddress.address);
       return [newAddress, ...filtered];
     });
-
-    toast.success("Address saved successfully");
   }, [formData]);
 
-  // Validate form
   const validateForm = useCallback(() => {
     const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'postalCode'];
     const newErrors = {};
-    
+
     required.forEach(field => {
       if (!formData[field]?.trim()) {
         newErrors[field] = "This field is required";
       }
     });
-    
+
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
     }
-    
-    if (formData.phone && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) {
-      newErrors.phone = "Enter 10-digit number";
-    }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  // Process payment
   const handlePayment = async () => {
     if (cart.length === 0) {
       toast.error("No items in cart");
@@ -269,7 +289,6 @@ const PaymentPage = () => {
       return;
     }
 
-    // Save address if checkbox is checked
     if (formData.saveAddress) {
       handleSaveAddress();
     }
@@ -277,9 +296,10 @@ const PaymentPage = () => {
     setLoading(true);
     try {
       const customer = {
-        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
         email: formData.email,
-        phone: formData.phone.replace(/\D/g, ""),
+        phone: formData.phone.replace(/[^\d+]/g, ""),
         address: formData.address,
         city: formData.city,
         state: formData.state,
@@ -296,16 +316,17 @@ const PaymentPage = () => {
       if (!res.ok) throw new Error("Payment failed");
 
       const data = await res.json();
-      
+
       if (!data.redirectUrl) {
         throw new Error("Payment gateway error");
       }
 
+      // We clear the cart here, but the loading overlay will handle the "empty page" feel
       clearCart();
       window.location.href = data.redirectUrl;
     } catch (error) {
-      toast.error("Payment failed", {
-        description: "Please try again or contact support",
+      toast.error("Payment initiation failed", {
+        description: error.message || "Please try again or contact support",
       });
       setLoading(false);
     }
@@ -314,7 +335,28 @@ const PaymentPage = () => {
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
+
+  // Loading Overlay for redirect
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center">
+        <div className="relative mb-8">
+          <div className="h-24 w-24 rounded-full border-4 border-blue-50 border-t-blue-600 animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <ShieldCheck className="h-10 w-10 text-blue-600" />
+          </div>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Redirecting to Secure Payment</h2>
+        <p className="text-gray-500 max-w-sm">Please do not refresh the page or click back. We are preparing your secure checkout session.</p>
+        <div className="mt-8 flex items-center gap-2 grayscale opacity-50">
+          <Image src="/logo/novotion_01.svg" alt="Novotion" width={30} height={30} />
+          <span className="font-bold text-gray-400">×</span>
+          <span className="font-bold text-gray-400">PAYGLOCAL</span>
+        </div>
       </div>
     );
   }
@@ -334,6 +376,15 @@ const PaymentPage = () => {
     );
   }
 
+  if (!isLoaded || !authChecked) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
+        <p className="mt-4 text-gray-500 font-medium">Loading checkout...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -344,9 +395,8 @@ const PaymentPage = () => {
           <div className="mb-10">
             <div className="flex items-center justify-center gap-2">
               <div className={`h-2 flex-1 rounded-full ${step >= 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
-              }`}>
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
+                }`}>
                 1
               </div>
               <div className={`h-2 flex-1 rounded-full ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
@@ -354,17 +404,21 @@ const PaymentPage = () => {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main Form */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
+                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                   <h1 className="text-2xl font-bold text-gray-900">
                     Billing Information
                   </h1>
+                  {user && (
+                    <span className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">
+                      Signed in as {user.email}
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-6">
-                  {/* Saved Addresses Dropdown */}
+                  {/* Saved Addresses */}
                   {savedAddresses.length > 0 && !isAddingNew && (
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-3">
@@ -380,319 +434,223 @@ const PaymentPage = () => {
                           Add New
                         </button>
                       </div>
-                      
+
                       <div className="space-y-2">
                         {savedAddresses.slice(0, showSavedAddresses ? undefined : 3).map((address) => (
                           <div
-                            key={address.id}
-                            className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-blue-500 hover:bg-blue-50 ${
-                              formData.email === address.email ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                            }`}
+                            key={address.id || address.email}
+                            className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-blue-500 hover:bg-blue-50 ${formData.address === address.address ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                              }`}
                             onClick={() => handleSelectAddress(address)}
                           >
                             <div className="flex items-start gap-3">
-                              <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${
-                                formData.email === address.email 
-                                  ? 'border-blue-500 bg-blue-500' 
-                                  : 'border-gray-300'
-                              }`}>
-                                {formData.email === address.email && (
+                              <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${formData.address === address.address
+                                ? 'border-blue-500 bg-blue-500'
+                                : 'border-gray-300'
+                                }`}>
+                                {formData.address === address.address && (
                                   <div className="h-2 w-2 rounded-full bg-white"></div>
                                 )}
                               </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {address.firstName} {address.lastName}
-                                  </span>
-                                  <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                                    {address.addressType === 'home' ? 'Home' : 
-                                     address.addressType === 'work' ? 'Work' : 'Other'}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-gray-600">{address.address}</p>
-                                <p className="text-sm text-gray-600">
-                                  {address.city}, {address.state} {address.postalCode}
-                                </p>
-                                <p className="text-sm text-gray-500 mt-1">
-                                  {address.email} • {address.phone}
-                                </p>
+                              <div className="flex-1 text-sm">
+                                <p className="font-bold text-gray-900">{address.firstName} {address.lastName}</p>
+                                <p className="text-gray-600">{address.address}, {address.city}</p>
+                                <p className="text-gray-500">{address.email} • {address.phone}</p>
                               </div>
                             </div>
                           </div>
                         ))}
-                        
-                        {savedAddresses.length > 3 && !showSavedAddresses && (
-                          <button
-                            type="button"
-                            onClick={() => setShowSavedAddresses(true)}
-                            className="w-full text-center text-sm text-blue-600 hover:text-blue-700 py-2"
-                          >
-                            Show {savedAddresses.length - 3} more addresses
-                            <ChevronDown className="h-4 w-4 inline-block ml-1" />
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="useSaved"
-                            checked={!isAddingNew}
-                            onChange={() => setIsAddingNew(true)}
-                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                          />
-                          <label htmlFor="useSaved" className="ml-2 text-sm text-gray-700">
-                            Use selected saved address
-                          </label>
-                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Add New Address Form */}
+                  {/* Form Fields */}
                   {(isAddingNew || savedAddresses.length === 0) && (
-                    <>
-                      <div className="mb-6">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {savedAddresses.length > 0 ? "Add New Address" : "Enter Billing Details"}
-                          </h3>
-                          {savedAddresses.length > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => setIsAddingNew(false)}
-                              className="text-sm text-gray-600 hover:text-gray-900"
-                            >
-                              ← Back to saved addresses
-                            </button>
-                          )}
-                        </div>
+                    <div className="grid md:grid-cols-2 gap-4 mb-6">
+                      <InputField
+                        label="First Name"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={createInputChangeHandler('firstName')}
+                        onBlur={createBlurHandler('firstName')}
+                        placeholder="e.g. Michael"
+                        error={errors.firstName}
+                        touched={touched.firstName}
+                      />
+                      <InputField
+                        label="Last Name"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={createInputChangeHandler('lastName')}
+                        onBlur={createBlurHandler('lastName')}
+                        placeholder="e.g. Scott"
+                        error={errors.lastName}
+                        touched={touched.lastName}
+                      />
+                      <div className="md:col-span-2">
+                        <InputField
+                          label="Email Address"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={createInputChangeHandler('email')}
+                          onBlur={createBlurHandler('email')}
+                          placeholder="e.g. michael.scott@dundermifflin.com"
+                          error={errors.email}
+                          touched={touched.email}
+                        />
                       </div>
-
-                      <div className="grid md:grid-cols-2 gap-4 mb-6">
-                        <InputField
-                          label="First Name"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={createInputChangeHandler('firstName')}
-                          onBlur={createBlurHandler('firstName')}
-                          placeholder="John"
-                          error={errors.firstName}
-                          touched={touched.firstName}
-                          autoFocus={true}
-                        />
-                        <InputField
-                          label="Last Name"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={createInputChangeHandler('lastName')}
-                          onBlur={createBlurHandler('lastName')}
-                          placeholder="Doe"
-                          error={errors.lastName}
-                          touched={touched.lastName}
-                        />
-                        <div className="md:col-span-2">
-                          <InputField
-                            label="Email Address"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={createInputChangeHandler('email')}
-                            onBlur={createBlurHandler('email')}
-                            placeholder="john@example.com"
-                            error={errors.email}
-                            touched={touched.email}
-                          />
-                        </div>
-                        <InputField
-                          label="Phone Number"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handlePhoneChange}
-                          onBlur={createBlurHandler('phone')}
-                          placeholder="9876543210"
-                          error={errors.phone}
-                          touched={touched.phone}
-                        />
-                        
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Address Type
-                          </label>
-                          <select
-                            name="addressType"
-                            value={formData.addressType}
-                            onChange={handleAddressTypeChange}
-                            className="w-full h-11 px-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors"
-                          >
-                            {ADDRESS_TYPES.map((type) => (
-                              <option key={type.value} value={type.value}>
-                                {type.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        
-                        <div className="md:col-span-2">
-                          <InputField
-                            label="Street Address"
-                            name="address"
-                            value={formData.address}
-                            onChange={createInputChangeHandler('address')}
-                            onBlur={createBlurHandler('address')}
-                            placeholder="123 Main Street, Apt 4B"
-                            error={errors.address}
-                            touched={touched.address}
-                          />
-                        </div>
-                        <InputField
-                          label="City"
-                          name="city"
-                          value={formData.city}
-                          onChange={createInputChangeHandler('city')}
-                          onBlur={createBlurHandler('city')}
-                          placeholder="Mumbai"
-                          error={errors.city}
-                          touched={touched.city}
-                        />
-                        <InputField
-                          label="State"
-                          name="state"
-                          value={formData.state}
-                          onChange={createInputChangeHandler('state')}
-                          onBlur={createBlurHandler('state')}
-                          placeholder="Maharashtra"
-                          error={errors.state}
-                          touched={touched.state}
-                        />
-                        <InputField
-                          label="Postal Code"
-                          name="postalCode"
-                          value={formData.postalCode}
-                          onChange={createInputChangeHandler('postalCode')}
-                          onBlur={createBlurHandler('postalCode')}
-                          placeholder="400001"
-                          error={errors.postalCode}
-                          touched={touched.postalCode}
-                        />
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Country
-                          </label>
-                          <select
-                            name="country"
-                            value={formData.country}
-                            onChange={handleCountryChange}
-                            className="w-full h-11 px-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors"
-                          >
-                            <option value="IN">India</option>
-                            <option value="US">United States</option>
-                            <option value="GB">United Kingdom</option>
-                          </select>
-                        </div>
+                      <InputField
+                        label="Phone Number"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handlePhoneChange}
+                        onBlur={createBlurHandler('phone')}
+                        placeholder="e.g. +1 123 456 7890"
+                        error={errors.phone}
+                        touched={touched.phone}
+                      />
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Country</label>
+                        <select
+                          name="country"
+                          value={formData.country}
+                          onChange={handleCountryChange}
+                          className="w-full h-11 px-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors"
+                        >
+                          <option value="US">United States</option>
+                          <option value="GB">United Kingdom</option>
+                          <option value="CA">Canada</option>
+                          <option value="AU">Australia</option>
+                          <option value="IN">India</option>
+                          <option value="DE">Germany</option>
+                          <option value="FR">France</option>
+                        </select>
                       </div>
-
-                      {/* Save Address Toggle */}
-                      <div className="flex items-center gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
-                        <input
-                          type="checkbox"
-                          id="saveAddress"
-                          name="saveAddress"
-                          checked={formData.saveAddress}
-                          onChange={createInputChangeHandler('saveAddress')}
-                          className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      <div className="md:col-span-2">
+                        <InputField
+                          label="Street Address"
+                          name="address"
+                          value={formData.address}
+                          onChange={createInputChangeHandler('address')}
+                          onBlur={createBlurHandler('address')}
+                          placeholder="e.g. 1725 Slough Avenue, Suite 200"
+                          error={errors.address}
+                          touched={touched.address}
                         />
-                        <label htmlFor="saveAddress" className="text-sm text-gray-700">
-                          Save this address for future purchases
-                        </label>
                       </div>
-                    </>
-                  )}
-
-                  {/* Security Info */}
-                  <div className="p-4 bg-blue-50 rounded-lg mb-6">
-                    <div className="flex items-start gap-3">
-                      <Lock className="h-5 w-5 text-blue-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-blue-900 mb-1">
-                          Secure Payment Processing
-                        </p>
-                        <p className="text-xs text-blue-800">
-                          All transactions are encrypted and secure. Your payment information is never stored on our servers.
-                        </p>
+                      <InputField
+                        label="City"
+                        name="city"
+                        value={formData.city}
+                        onChange={createInputChangeHandler('city')}
+                        onBlur={createBlurHandler('city')}
+                        placeholder="e.g. Scranton"
+                        error={errors.city}
+                        touched={touched.city}
+                      />
+                      <InputField
+                        label="State / Province"
+                        name="state"
+                        value={formData.state}
+                        onChange={createInputChangeHandler('state')}
+                        onBlur={createBlurHandler('state')}
+                        placeholder="e.g. Pennsylvania"
+                        error={errors.state}
+                        touched={touched.state}
+                      />
+                      <InputField
+                        label="Postal / Zip Code"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={createInputChangeHandler('postalCode')}
+                        onBlur={createBlurHandler('postalCode')}
+                        placeholder="e.g. 18505"
+                        error={errors.postalCode}
+                        touched={touched.postalCode}
+                      />
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Address Type</label>
+                        <select
+                          name="addressType"
+                          value={formData.addressType}
+                          onChange={handleAddressTypeChange}
+                          className="w-full h-11 px-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors"
+                        >
+                          {ADDRESS_TYPES.map((type) => (
+                            <option key={type.value} value={type.value}>{type.label}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
+                  )}
+
+                  <div className="flex items-center gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="saveAddress"
+                      name="saveAddress"
+                      checked={formData.saveAddress}
+                      onChange={createInputChangeHandler('saveAddress')}
+                      className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="saveAddress" className="text-sm text-gray-700">
+                      Save this information for later
+                    </label>
                   </div>
 
-                  {/* Payment Button */}
                   <Button
                     onClick={handlePayment}
                     disabled={loading}
-                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base rounded-lg transition-colors shadow-sm hover:shadow"
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base rounded-lg transition-colors shadow-sm hover:shadow active:scale-[0.98]"
                   >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Processing Secure Payment...
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        <CreditCard className="h-5 w-5" />
-                        Pay ${total} Now
-                      </span>
-                    )}
+                    <span className="flex items-center justify-center gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      Pay ${total} Now
+                    </span>
                   </Button>
                 </div>
               </div>
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-32">
                 <h3 className="text-lg font-bold mb-6 pb-4 border-b border-gray-100">
                   Order Summary
                 </h3>
 
-                <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2">
+                <div className="space-y-4 mb-6">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">
-                          {item.name}
-                        </h4>
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
-                          {item.description}
-                        </p>
+                    <div key={item.id} className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.description}</p>
                       </div>
-                      <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
-                        ${item.price}
-                      </span>
+                      <span className="text-sm font-semibold text-gray-900">${item.price}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="space-y-4 pt-6 border-t border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">${total}</span>
+                <div className="space-y-3 pt-6 border-t border-gray-100">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span>${total}</span>
                   </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                  <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                     <span className="text-lg font-bold">Total</span>
                     <span className="text-2xl font-bold text-blue-600">${total}</span>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                  <div className="flex items-center gap-2 text-sm text-green-700">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span className="font-medium">Secure Payment</span>
+                <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                  <div className="flex items-start gap-3">
+                    <Lock className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-bold text-blue-900">Secure Checkout</p>
+                      <p className="text-xs text-blue-800 leading-relaxed">Powered by PayGlocal. Your data is encrypted and never stored on our servers.</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Encrypted and secure payment processing
-                  </p>
                 </div>
               </div>
             </div>

@@ -170,7 +170,7 @@ const CartPage = () => {
                   >
                     <div className="flex gap-4 items-start">
                       {/* Service Icon */}
-                      <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                         <ShoppingBag className="h-5 w-5 text-gray-600" />
                       </div>
 
@@ -343,7 +343,7 @@ const CartPage = () => {
                   <div className="pt-4 border-t border-gray-200">
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                           <ShieldCheck className="h-4 w-4 text-green-600" />
                         </div>
                         <div>
@@ -356,7 +356,7 @@ const CartPage = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                           <CreditCard className="h-4 w-4 text-blue-600" />
                         </div>
                         <div>

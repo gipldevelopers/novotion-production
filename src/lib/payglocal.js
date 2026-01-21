@@ -11,18 +11,18 @@ const PAYGLOCAL_PUBLIC_KEY_ID =
 const PAYGLOCAL_ENV = process.env.PAYGLOCAL_ENV || "uat";
 
 // Set to true to test payment flow without real PayGlocal API
-const MOCK_MODE = true;
+const MOCK_MODE = false;
 
 const PAYGLOCAL_GPI_URL =
   PAYGLOCAL_ENV === "prod"
-    ? "https://api.prod.payglocal.in/gl/v1/payments/initiate"
-    : "https://api.uat.payglocal.in/gl/v1/payments/initiate";
+    ? "https://api.prod.payglocal.in/gl/v1/payments/initiate/paycollect"
+    : "https://api.uat.payglocal.in/gl/v1/payments/initiate/paycollect";
 
 // Key file paths - place your .pem files in src/key/
 const KEYS_DIR = path.join(process.cwd(), "src", "key");
 const PRIVATE_KEY_PATH = path.join(
   KEYS_DIR,
-  process.env.PRIVATE_KEY_PATH || "novotion_payglocal_private_key.pem"
+  process.env.PRIVATE_KEY_PATH || "kId-CCC8JomSXhTg6zk4_uat_novot_652.pem"
 );
 const PUBLIC_KEY_PATH = path.join(
   KEYS_DIR,
@@ -60,7 +60,7 @@ function getKeys() {
   try {
     const privateKey = fs.readFileSync(PRIVATE_KEY_PATH, "utf8");
     const publicKey = fs.readFileSync(PUBLIC_KEY_PATH, "utf8");
-    
+
     return { privateKey, publicKey };
   } catch (err) {
     console.error("[PayGlocal] ❌ Failed to load keys:", err.message);
@@ -141,12 +141,12 @@ export async function createPayGlocalPaymentSession({
       totalAmount: amount.toFixed(2),
       txnCurrency: currency,
       billingData: {
-        firstName: customer?.name?.split(" ")[0] || "Customer",
-        lastName: customer?.name?.split(" ").slice(1).join(" ") || "",
+        firstName: customer?.firstName || customer?.name?.split(" ")[0] || "Customer",
+        lastName: customer?.lastName || customer?.name?.split(" ").slice(1).join(" ") || "",
         addressStreet1: customer?.address || "NA",
         addressCity: customer?.city || "NA",
         addressState: customer?.state || "NA",
-        addressPostalCode: customer?.postalCode || "000000",
+        addressPostalCode: customer?.postalCode || "400001",
         addressCountry: customer?.country || "IN",
         emailId: customer?.email || "customer@example.com",
         phoneNo: customer?.phone || "9999999999",
@@ -156,10 +156,9 @@ export async function createPayGlocalPaymentSession({
     returnUrl: returnUrl,
   };
 
-  console.log("[PayGlocal] 📦 Payload:", JSON.stringify(payload, null, 2));
+  console.log("[PayGlocal] Payload:", JSON.stringify(payload, null, 2));
 
   const { privateKey, publicKey } = getKeys();
-
   // Use official PayGlocal client to generate JWE and JWS tokens
   const { jweToken, jwsToken } = await generateJWEAndJWS({
     payload,
@@ -170,14 +169,9 @@ export async function createPayGlocalPaymentSession({
     publicKeyId: PAYGLOCAL_PUBLIC_KEY_ID,
   });
 
-  console.log(
-    "[PayGlocal] 🔑 JWE Token (first 50):",
-    jweToken?.substring(0, 50) + "..."
-  );
-  console.log(
-    "[PayGlocal] 🔐 JWS Token (first 50):",
-    jwsToken?.substring(0, 50) + "..."
-  );
+  console.log("[PayGlocal] 🔑 JWE Token (first 50):", jweToken);
+
+  console.log("[PayGlocal] 🔐 JWS Token (first 50):", jwsToken);
   console.log("[PayGlocal] 🔗 URL:", PAYGLOCAL_GPI_URL);
   console.log("[PayGlocal] 🏪 Merchant:", PAYGLOCAL_MERCHANT_ID);
 
@@ -211,19 +205,22 @@ export async function createPayGlocalPaymentSession({
     throw new Error("Invalid response from payment gateway. Please try again.");
   }
 
-  if (!data.redirectUrl && !data.redirectURL) {
+  // PayGlocal responses often wrap the main data in a 'data' property
+  const responseData = data.data || data;
+
+  if (!responseData.redirectUrl && !responseData.redirectURL) {
     throw new Error(
       "Payment session created but redirect URL is missing. Please try again."
     );
   }
 
   return {
-    gid: data.gid || data.GID,
-    status: data.status || data.Status,
-    message: data.message || data.Message,
-    reasonCode: data.reasonCode,
-    redirectUrl: data.redirectUrl || data.redirectURL,
-    statusUrl: data.statusUrl || data.statusURL,
+    gid: data.gid || responseData.gid || data.GID,
+    status: data.status || responseData.status || data.Status,
+    message: data.message || responseData.message || data.Message,
+    reasonCode: data.reasonCode || responseData.reasonCode,
+    redirectUrl: responseData.redirectUrl || responseData.redirectURL,
+    statusUrl: responseData.statusUrl || responseData.statusURL,
     raw: data,
   };
 }
