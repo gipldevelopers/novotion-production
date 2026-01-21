@@ -11,6 +11,9 @@ import {
   Plus,
   ChevronDown,
   Loader2,
+  Trash2,
+  Edit2,
+  ArrowLeft,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -99,6 +102,7 @@ const PaymentPage = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [showSavedAddresses, setShowSavedAddresses] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -238,27 +242,66 @@ const PaymentPage = () => {
       addressType: "home",
       saveAddress: true,
     });
+    setEditingAddressId(null);
     setIsAddingNew(true);
     setShowSavedAddresses(false);
   }, [user]);
+
+  const handleEditAddress = useCallback((e, address) => {
+    e.stopPropagation();
+    setFormData({
+      ...address,
+      saveAddress: true,
+    });
+    setEditingAddressId(address.id);
+    setIsAddingNew(true);
+    setShowSavedAddresses(false);
+  }, []);
+
+  const handleDeleteAddress = useCallback((e, addressId) => {
+    e.stopPropagation();
+    setSavedAddresses(prev => prev.filter(addr => addr.id !== addressId));
+    toast.success("Address deleted");
+  }, []);
+
+  const handleBackToSaved = useCallback(() => {
+    setIsAddingNew(false);
+    setEditingAddressId(null);
+    // If we have saved addresses, show them
+    if (savedAddresses.length > 0) {
+      setShowSavedAddresses(false); // Just reset to selection view
+    }
+  }, [savedAddresses.length]);
 
   const handleSaveAddress = useCallback(() => {
     if (!validateForm()) {
       return;
     }
 
-    const newAddress = {
-      id: Date.now(),
+    const addressData = {
       ...formData,
       label: `${ADDRESS_TYPES.find(t => t.value === formData.addressType)?.label} - ${formData.city}`,
       timestamp: new Date().toISOString(),
     };
 
     setSavedAddresses(prev => {
-      const filtered = prev.filter(addr => addr.email !== newAddress.email || addr.address !== newAddress.address);
-      return [newAddress, ...filtered];
+      if (editingAddressId) {
+        // Update existing
+        return prev.map(addr => addr.id === editingAddressId ? { ...addressData, id: editingAddressId } : addr);
+      } else {
+        // Add new
+        const newAddress = {
+          id: Date.now(),
+          ...addressData,
+        };
+        const filtered = prev.filter(addr => addr.email !== newAddress.email || addr.address !== newAddress.address);
+        return [newAddress, ...filtered];
+      }
     });
-  }, [formData]);
+
+    setEditingAddressId(null);
+    setIsAddingNew(false);
+  }, [formData, editingAddressId]);
 
   const validateForm = useCallback(() => {
     const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'postalCode'];
@@ -439,12 +482,12 @@ const PaymentPage = () => {
                         {savedAddresses.slice(0, showSavedAddresses ? undefined : 3).map((address) => (
                           <div
                             key={address.id || address.email}
-                            className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-blue-500 hover:bg-blue-50 ${formData.address === address.address ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                            className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-blue-500 group ${formData.address === address.address ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                               }`}
                             onClick={() => handleSelectAddress(address)}
                           >
                             <div className="flex items-start gap-3">
-                              <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${formData.address === address.address
+                              <div className={`mt-1 h-5 w-5 rounded-full border flex items-center justify-center ${formData.address === address.address
                                 ? 'border-blue-500 bg-blue-500'
                                 : 'border-gray-300'
                                 }`}>
@@ -453,7 +496,27 @@ const PaymentPage = () => {
                                 )}
                               </div>
                               <div className="flex-1 text-sm">
-                                <p className="font-bold text-gray-900">{address.firstName} {address.lastName}</p>
+                                <div className="flex items-center justify-between">
+                                  <p className="font-bold text-gray-900">{address.firstName} {address.lastName}</p>
+                                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handleEditAddress(e, address)}
+                                      className="p-1 text-gray-400 hover:text-blue-600 rounded"
+                                      title="Edit Address"
+                                    >
+                                      <Edit2 className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handleDeleteAddress(e, address.id)}
+                                      className="p-1 text-gray-400 hover:text-red-600 rounded"
+                                      title="Delete Address"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
                                 <p className="text-gray-600">{address.address}, {address.city}</p>
                                 <p className="text-gray-500">{address.email} • {address.phone}</p>
                               </div>
@@ -461,6 +524,23 @@ const PaymentPage = () => {
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Form Header for New/Edit */}
+                  {isAddingNew && (
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                      <button
+                        type="button"
+                        onClick={handleBackToSaved}
+                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to Selection
+                      </button>
+                      <h2 className="text-lg font-bold text-gray-900">
+                        {editingAddressId ? "Edit Address" : "Add New Address"}
+                      </h2>
                     </div>
                   )}
 

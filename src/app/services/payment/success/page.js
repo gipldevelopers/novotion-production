@@ -6,11 +6,19 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 import { useSearchParams } from 'next/navigation';
+import { useCart } from '@/lib/CartContext';
+import { useEffect } from 'react';
 
 export default function PaymentSuccess() {
   const searchParams = useSearchParams();
+  const { clearCart } = useCart();
   const txnId = searchParams.get('txnId');
   const amount = searchParams.get('amount');
+
+  useEffect(() => {
+    // Clear cart on successful payment arrival
+    clearCart();
+  }, [clearCart]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30">

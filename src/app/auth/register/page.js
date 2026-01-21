@@ -22,6 +22,19 @@ export default function RegisterPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setFormError("Please enter a valid email address");
+      return;
+    }
+
+    if (password.length < 6) {
+      setFormError("Password must be at least 6 characters long");
+      return;
+    }
+
     setLoading(true);
     setFormError("");
 
