@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const CartContext = createContext();
 
@@ -35,30 +35,37 @@ export const CartProvider = ({ children }) => {
     }
   }, [cart, isLoaded]);
 
-  const addToCart = (item) => {
+  const addToCart = useCallback((item) => {
     setCart((prev) => {
-      // Check if item already exists to avoid duplicates if needed
-      // For services, maybe they can add multiple, but usually one of each is enough
       const exists = prev.find(i => i.id === item.id);
-      if (exists) return prev; 
+      if (exists) return prev;
       return [...prev, { ...item, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const removeFromCart = (id) => {
+  const removeFromCart = useCallback((id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCart([]);
-  };
+  }, []);
 
-  const getCartTotal = () => {
+  const getCartTotal = useCallback(() => {
     return cart.reduce((total, item) => total + (item.price || 0), 0);
-  };
+  }, [cart]);
+
+  const value = useMemo(() => ({
+    cart,
+    addToCart,
+    removeFromCart,
+    clearCart,
+    getCartTotal,
+    isLoaded
+  }), [cart, addToCart, removeFromCart, clearCart, getCartTotal, isLoaded]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, getCartTotal, isLoaded }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );

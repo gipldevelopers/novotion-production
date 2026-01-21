@@ -1,68 +1,87 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { XCircle, AlertCircle, Home, RefreshCw } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { XCircle, AlertCircle, Home, RefreshCw, MessageCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useSearchParams } from 'next/navigation';
 
 export default function PaymentFailure() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+
     const reason = searchParams.get('reason') || 'Transaction was declined by the bank or cancelled.';
     const txnId = searchParams.get('txnId');
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-red-50/20 to-orange-50/20">
+        <div className="min-h-screen bg-gray-50/50">
             <Header />
 
-            <section className="py-20">
+            <section className="pt-32 pb-20">
                 <div className="container mx-auto px-4 sm:px-6">
-                    <div className="max-w-md mx-auto text-center">
-                        <div className="h-20 w-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <XCircle className="h-10 w-10 text-red-600" />
-                        </div>
+                    <div className="max-w-2xl mx-auto">
 
-                        <h1 className="text-3xl font-bold mb-4">Payment Failed</h1>
-                        <p className="text-gray-600 mb-6">
-                            {reason}
-                        </p>
+                        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-xl shadow-red-100/50 border border-gray-100 text-center relative overflow-hidden">
+                            {/* Decorative Accent (Not text) */}
+                            <div className="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
 
-                        {txnId && (
-                            <div className="bg-white border border-gray-100 rounded-lg p-3 mb-8 text-sm">
-                                <span className="text-gray-500">Transaction ID: </span>
-                                <span className="font-mono font-medium text-gray-900">{txnId}</span>
+                            <div className="h-24 w-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8 animate-in zoom-in duration-500">
+                                <XCircle className="h-12 w-12 text-red-500" />
                             </div>
-                        )}
 
-                        <div className="bg-red-50 rounded-lg p-6 mb-8 text-left border border-red-100">
-                            <div className="flex gap-3">
-                                <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-                                <div>
-                                    <h3 className="font-semibold text-red-900 mb-1">What can you do?</h3>
-                                    <ul className="space-y-2 text-sm text-red-800">
-                                        <li>Check your card details and try again</li>
-                                        <li>Ensure you have sufficient funds</li>
-                                        <li>Contact your bank for authorization</li>
-                                        <li>Try a different payment method</li>
-                                    </ul>
+                            <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Payment Failed</h1>
+                            <p className="text-gray-500 mb-8">{reason}</p>
+
+                            {txnId && (
+                                <div className="max-w-xs mx-auto bg-gray-50 border border-gray-100 rounded-xl p-3 mb-10">
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Reference ID</p>
+                                    <p className="text-sm font-mono text-gray-700 truncate">{txnId}</p>
+                                </div>
+                            )}
+
+                            <div className="bg-red-50/50 rounded-2xl p-6 mb-10 border border-red-100 text-left">
+                                <h3 className="text-lg font-bold text-red-900 mb-4 px-2 flex items-center gap-2">
+                                    <AlertCircle className="h-5 w-5" />
+                                    What happened?
+                                </h3>
+                                <div className="space-y-4">
+                                    {[
+                                        "Incorrect card details (CVV, Expiry, or Card Number).",
+                                        "Insufficient funds in your account.",
+                                        "Transaction blocked by your bank for security.",
+                                        "Network connection issues during processing."
+                                    ].map((step, i) => (
+                                        <div key={i} className="flex gap-3 items-start group">
+                                            <div className="mt-1 h-5 w-5 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                                                <div className="h-1.5 w-1.5 rounded-full bg-red-600"></div>
+                                            </div>
+                                            <p className="text-red-800 text-sm leading-relaxed">{step}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <Link href="/services/payment" className="w-full">
+                                    <Button className="w-full h-14 rounded-2xl gap-2 font-bold bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200">
+                                        <RefreshCw className="h-5 w-5" />
+                                        Try Again
+                                    </Button>
+                                </Link>
+                                <Link href="/contact" className="w-full">
+                                    <Button variant="outline" className="w-full h-14 rounded-2xl gap-2 font-bold text-gray-700 hover:bg-gray-50 border-gray-200">
+                                        <MessageCircle className="h-5 w-5" />
+                                        Contact Support
+                                    </Button>
+                                </Link>
+                            </div>
+
+                            <Link href="/" className="inline-block mt-8 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+                                Return to Home
+                            </Link>
                         </div>
 
-                        <div className="space-y-3">
-                            <Link href="/services/payment">
-                                <Button className="w-full bg-red-600 hover:bg-red-700">
-                                    <RefreshCw className="mr-2 h-4 w-4" />
-                                    Try Again
-                                </Button>
-                            </Link>
-                            <Link href="/">
-                                <Button variant="outline" className="w-full">
-                                    <Home className="mr-2 h-4 w-4" />
-                                    Return to Home
-                                </Button>
-                            </Link>
-                        </div>
                     </div>
                 </div>
             </section>

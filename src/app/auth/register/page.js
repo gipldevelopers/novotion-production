@@ -23,7 +23,6 @@ export default function RegisterPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setFormError("Please enter a valid email address");
@@ -56,7 +55,7 @@ export default function RegisterPage() {
 
       toast.success("Account created successfully!");
       router.push(callbackUrl);
-      router.refresh(); // Refresh to update header state
+      router.refresh();
     } catch (err) {
       setFormError("An unexpected error occurred. Please try again.");
       toast.error("Connection error");
@@ -66,15 +65,9 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen grid lg:grid-cols-2 bg-white">
-      {/* Left Side: Illustration & Branding */}
       <div className="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-indigo-700 to-blue-900 text-white relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="flex items-center gap-2 mb-12">
-            <Image src="/logo/novotion_01.svg" alt="Novotion" width={40} height={40} className="brightness-0 invert" />
-            <span className="text-2xl font-bold tracking-tight text-white">Novotion</span>
-          </Link>
-
-          <div className="max-w-md">
+          <div className="max-w-md mt-12">
             <h2 className="text-4xl font-extrabold leading-tight mb-6">
               Join the future of professional growth.
             </h2>
@@ -101,15 +94,12 @@ export default function RegisterPage() {
             <p className="text-sm text-indigo-100">Safe and secure registration.</p>
           </div>
         </div>
-
-        {/* Background Decor */}
-        <div className="absolute -bottom-20 -right-20 h-96 w-96 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
-        <div className="absolute -top-20 -left-20 h-96 w-96 bg-blue-500 rounded-full blur-3xl opacity-20"></div>
       </div>
 
-      {/* Right Side: Register Form */}
-      <div className="flex flex-col items-center justify-center p-8 lg:p-12">
+      <div className="flex flex-col items-center justify-center p-8 lg:p-12 relative">
         <div className="w-full max-w-sm space-y-8">
+
+
           <div className="text-center lg:text-left">
             <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
             <p className="text-gray-500 mt-2">Start your premium journey with us today</p>

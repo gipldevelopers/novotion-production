@@ -14,6 +14,8 @@ import {
   Trash2,
   Edit2,
   ArrowLeft,
+  Home,
+  ArrowRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -406,15 +408,56 @@ const PaymentPage = () => {
 
   if (cart.length === 0 && step !== 2) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Header />
-        <div className="pt-40 pb-20 text-center">
-          <ShoppingBag className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">No items to checkout</h2>
-          <Link href="/services/pro-services">
-            <Button>Go to Services</Button>
-          </Link>
-        </div>
+        <main className="container mx-auto px-4 pt-48 pb-20">
+          <div className="max-w-lg mx-auto text-center">
+            <div className="relative inline-block mb-8">
+              <div className="h-32 w-32 bg-blue-50 rounded-full flex items-center justify-center mx-auto animate-in zoom-in duration-700">
+                <ShoppingBag className="h-16 w-16 text-blue-500/40" />
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-xl shadow-lg border border-gray-100 animate-in slide-in-from-bottom-2 duration-1000">
+                <Plus className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+
+            <h2 className="text-3xl font-black text-gray-900 mb-4">Your bag is empty</h2>
+            <p className="text-gray-500 mb-10 leading-relaxed max-w-sm mx-auto">
+              Looks like you haven't added any premium services to your cart yet. Explore our career-boosting packages today.
+            </p>
+
+            <div className="flex flex-col gap-4">
+              <Link href="/services/pro-services">
+                <Button className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-2 text-lg">
+                  Explore Services
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/">
+                <Button variant="outline" className="w-full h-14 rounded-2xl font-bold text-gray-700 border-gray-200 hover:bg-gray-50">
+                  <Home className="h-5 w-5 mr-2" />
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-16 pt-8 border-t border-gray-50 flex items-center justify-center gap-8 grayscale opacity-40">
+              <div className="flex flex-col items-center">
+                <ShieldCheck className="h-6 w-6 mb-1" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Secure</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Lock className="h-6 w-6 mb-1" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Encrypted</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <CheckCircle2 className="h-6 w-6 mb-1" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Verified</span>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }

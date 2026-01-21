@@ -55,11 +55,6 @@ export default function LoginPage() {
       {/* Left Side: Illustration & Branding */}
       <div className="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-blue-700 to-indigo-900 text-white relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="flex items-center gap-2 mb-12">
-            <Image src="/logo/novotion_01.svg" alt="Novotion" width={40} height={40} className="brightness-0 invert" />
-            <span className="text-2xl font-bold tracking-tight text-white">Novotion</span>
-          </Link>
-
           <div className="max-w-md">
             <h2 className="text-4xl font-extrabold leading-tight mb-6">
               Empowering Your Professional Journey.
@@ -84,8 +79,9 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Login Form */}
-      <div className="flex flex-col items-center justify-center p-8 lg:p-12">
+      <div className="flex flex-col items-center justify-center p-8 lg:p-12 relative">
         <div className="w-full max-w-sm space-y-8">
+
           <div className="text-center lg:text-left">
             <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
             <p className="text-gray-500 mt-2">Enter your credentials to access your account</p>
