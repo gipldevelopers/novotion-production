@@ -300,6 +300,7 @@ import StatsSection from "@/components/home/StatsSection";
 import TrustedBySection from "@/components/home/TrustedBySection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import PaidServicesSection from "@/components/home/PaidServicesSection"; // Add this import
+import CustomPackagesSection from "@/components/home/CustomPackagesSection";
 
 const Home = () => {
   const [mounted, setMounted] = useState(false);
@@ -471,6 +472,9 @@ const Home = () => {
 
       {/* Paid Services Section - NEW ADDITION */}
       <PaidServicesSection />
+
+      {/* Custom Packages Section */}
+      <CustomPackagesSection />
 
       <section className="py-12 md:py-20 lg:min-h-[80vh] flex items-center bg-primary text-white relative overflow-hidden">
         <div className="absolute inset-0">

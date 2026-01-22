@@ -285,7 +285,7 @@ const PaidServicesSection = () => {
                 </div>
 
                 <div className="mb-8 p-4 rounded-xl bg-white border border-slate-100 text-center">
-                  <p className="text-xs text-slate-400 font-bold mb-1 uppercase tracking-tighter">Flexible installments</p>
+                  <p className="text-xs text-slate-400 font-bold mb-1 uppercase tracking-tighter">only in</p>
                   <p className="text-lg font-black text-slate-900">${plan.installment} <span className="text-slate-400 font-medium text-sm">/ mo</span></p>
                 </div>
 

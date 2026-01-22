@@ -41,7 +41,14 @@ function LoginForm() {
       }
 
       toast.success("Welcome back!");
-      router.push(callbackUrl);
+
+      // Check for admin role and redirect accordingly
+      if (data.user?.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push(callbackUrl);
+      }
+
       router.refresh(); // Refresh to update header state
     } catch (err) {
       setFormError("An unexpected error occurred. Please try again.");

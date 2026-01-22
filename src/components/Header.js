@@ -68,7 +68,8 @@ const Header = () => {
         { href: '/services/rpo', label: 'Recruitment Process Outsourcing' },
         { href: '/services/career-support', label: 'Career Support Services' },
         { href: '/services/career-packages', label: 'Career Growth Packages' },
-        { href: '/services/pro-services', label: 'Pro Services' }
+        { href: '/services/pro-services', label: 'Pro Services' },
+        { href: '/services/custom-services', label: 'Custom Services' }
       ]
     },
     { href: '/blog', label: 'Blog' },

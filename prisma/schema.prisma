@@ -13,6 +13,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   password      String
+  role          Role      @default(USER)
   name          String?
   image         String?
   phone         String?
@@ -25,6 +26,11 @@ model User {
   updatedAt     DateTime  @updatedAt
   payments      Payment[]
   purchases     Purchase[]
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Payment {

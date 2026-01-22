@@ -33,7 +33,11 @@ export async function POST(request) {
             });
         }
 
-        const token = signJwt({ userId: user.id, email: user.email });
+        const token = signJwt({
+            userId: user.id,
+            email: user.email,
+            role: user.role
+        });
 
         const cookieStore = await cookies();
         cookieStore.set("auth_token", token, {

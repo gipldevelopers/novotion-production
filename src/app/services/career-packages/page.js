@@ -30,6 +30,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCart } from '@/lib/CartContext';
 import { toast } from 'sonner';
+import CustomPackagesSection from '@/components/home/CustomPackagesSection';
 
 const Card = ({ children, className = "", ...props }) => (
   <div className={`rounded-lg sm:rounded-xl border border-gray-100 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 ${className}`} {...props}>
@@ -287,7 +288,7 @@ const CareerPackages = () => {
       description: item.description || `Package: ${item.name}`,
       type: type
     };
-    
+
     addToCart(cartItem);
     toast.success(`${item.name} added to cart!`, {
       description: "You can view it in your cart and proceed to payment.",
@@ -297,7 +298,7 @@ const CareerPackages = () => {
         onClick: () => window.location.href = '/services/cart'
       },
     });
-    
+
     if (showCheckoutModal) {
       setShowCheckoutModal(false);
     }
@@ -476,7 +477,7 @@ const CareerPackages = () => {
 
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-gray-600">Flexible Payment:</span>
+                      {/* <span className="text-gray-600">Flexible Payment:</span> */}
                       <span className="font-semibold">${plan.installment}/month</span>
                     </div>
                     <div className="text-xs text-gray-500 text-center">
@@ -577,6 +578,9 @@ const CareerPackages = () => {
           </div>
         </div>
       </section>
+
+      {/* Custom Packages Section */}
+      <CustomPackagesSection />
 
       {/* Checkout Modal */}
       {showCheckoutModal && selectedPackage && (

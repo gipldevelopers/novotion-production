@@ -375,7 +375,7 @@ const ServicesSection = () => {
                     </Button>
                   </Link>
                   <Link href="/services/pro-services" className="w-full sm:w-auto">
-                    <Button variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/5 rounded-xl px-10 h-14 font-black text-base transition-all">
+                    <Button variant="outline" className="w-full sm:w-auto border-white/20  hover:bg-white/5 rounded-xl px-10 h-14 font-black text-base transition-all">
                       Browse Services
                     </Button>
                   </Link>
