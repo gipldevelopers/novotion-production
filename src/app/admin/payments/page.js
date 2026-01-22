@@ -7,25 +7,35 @@ import {
     ChevronRight,
     ChevronLeft,
     RefreshCw,
-    CheckCircle2,
+    CheckCircle,
     XCircle,
     Clock,
-    ArrowRight,
-    Filter,
     DollarSign,
     TrendingUp,
-    ExternalLink
+    Filter,
+    MoreVertical,
+    Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
 const PaymentsPage = () => {
     const [payments, setPayments] = useState([]);
-    const [stats, setStats] = useState({ totalRevenue: 0, successCount: 0 });
+    const [stats, setStats] = useState({ 
+        totalRevenue: 0, 
+        successCount: 0,
+        pendingCount: 0,
+        failedCount: 0
+    });
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-    const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 });
+    const [pagination, setPagination] = useState({ 
+        page: 1, 
+        limit: 10, 
+        total: 0, 
+        totalPages: 0 
+    });
 
     const fetchPayments = useCallback(async (page = 1) => {
         setLoading(true);
@@ -53,7 +63,7 @@ const PaymentsPage = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchPayments(1);
-        }, 300); // Debounce search
+        }, 300);
         return () => clearTimeout(timer);
     }, [searchTerm, statusFilter, fetchPayments]);
 
@@ -63,184 +73,348 @@ const PaymentsPage = () => {
         }
     };
 
-    return (
-        <div className="animate-in fade-in duration-700 max-w-[1400px] mx-auto min-h-screen pb-20 font-sans">
-            <div className="space-y-10">
-                {/* Header */}
-                <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tighter">Transaction Ledger</h1>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] mt-1 italic">Financial Velocity & Global Settlements</p>
-                    </div>
+    const totalSuccessRevenue = payments
+        .filter(p => p.status === 'SUCCESS')
+        .reduce((sum, p) => sum + p.amount, 0);
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-4 focus-within:ring-blue-50 transition-all">
-                            <Search className="h-4 w-4 text-gray-300" />
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
+                    <p className="text-gray-600 mt-1">Monitor and manage payment transactions</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200">
+                        Export Payments
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 rounded-lg transition-colors">
+                        Process Refund
+                    </button>
+                </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Total Revenue</p>
+                            <p className="text-2xl font-bold text-gray-900">${totalSuccessRevenue.toLocaleString()}</p>
+                        </div>
+                        <div className="h-12 w-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <DollarSign className="h-6 w-6 text-emerald-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-emerald-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Successful payments</span>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Successful</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.successCount}</p>
+                        </div>
+                        <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <CheckCircle className="h-6 w-6 text-green-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Completed transactions</span>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Pending</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.pendingCount}</p>
+                        </div>
+                        <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <Clock className="h-6 w-6 text-yellow-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-yellow-600">
+                        <Clock className="h-4 w-4" />
+                        <span>Awaiting processing</span>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Failed</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.failedCount}</p>
+                        </div>
+                        <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <XCircle className="h-6 w-6 text-red-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-red-600">
+                        <XCircle className="h-4 w-4" />
+                        <span>Failed transactions</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-1">
+                        <div className="relative max-w-md">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search Order ID / User..."
+                                placeholder="Search by order ID or customer..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-transparent border-none outline-none text-[11px] font-bold text-gray-600 w-56 uppercase tracking-widest"
+                                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-
+                    </div>
+                    <div className="flex items-center gap-3">
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="h-10 px-4 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 transition-all shadow-sm text-gray-500 cursor-pointer"
+                            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[140px]"
                         >
-                            <option value="">All Statuses</option>
-                            <option value="SUCCESS">Success Only</option>
-                            <option value="PENDING">Pending Only</option>
-                            <option value="FAILED">Failed Records</option>
+                            <option value="">All Status</option>
+                            <option value="SUCCESS">Success</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="FAILED">Failed</option>
                         </select>
-
-                        <button onClick={() => fetchPayments(1)} className="h-10 w-10 flex items-center justify-center bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-sm">
-                            <RefreshCw className={`h-3.5 w-3.5 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+                        <button
+                            onClick={() => fetchPayments(1)}
+                            className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            disabled={loading}
+                        >
+                            <RefreshCw className={`h-4 w-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
+            </div>
 
-                {/* Statistics Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between group hover:border-emerald-100 transition-all">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Settled Revenue</p>
-                            <p className="text-4xl font-black text-gray-900 leading-none">${stats.totalRevenue.toLocaleString()}</p>
-                            <div className="mt-4 flex items-center gap-2">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Verified Inflow</span>
+            {/* Payments Table */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-gray-200 bg-gray-50">
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Order ID
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Customer
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {!loading ? (
+                                payments.map((payment) => (
+                                    <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                    <CreditCard className="h-5 w-5 text-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900 truncate max-w-[180px]">
+                                                        {payment.orderId}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">{payment.method || 'Card'}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            {payment.user ? (
+                                                <Link href={`/admin/users/${payment.user.id}`} className="group">
+                                                    <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600">
+                                                        {payment.user.name || 'Unknown User'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">{payment.user.email}</p>
+                                                </Link>
+                                            ) : (
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">Unknown User</p>
+                                                    <p className="text-xs text-gray-500">User not found</p>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <p className="text-sm text-gray-600">
+                                                {new Date(payment.createdAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {new Date(payment.createdAt).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </p>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                                payment.status === 'SUCCESS'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : payment.status === 'PENDING'
+                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-red-100 text-red-800'
+                                            }`}>
+                                                {payment.status === 'SUCCESS' ? (
+                                                    <>
+                                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                                        Success
+                                                    </>
+                                                ) : payment.status === 'PENDING' ? (
+                                                    <>
+                                                        <Clock className="h-3 w-3 mr-1" />
+                                                        Pending
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <XCircle className="h-3 w-3 mr-1" />
+                                                        Failed
+                                                    </>
+                                                )}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <p className="text-sm font-semibold text-gray-900">${payment.amount}</p>
+                                            <p className="text-xs text-gray-500">{payment.currency || 'USD'}</p>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-2">
+                                                <button className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
+                                                    View Details
+                                                </button>
+                                                <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                                                <div className="space-y-2">
+                                                    <div className="h-4 w-40 bg-gray-200 rounded"></div>
+                                                    <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="space-y-2">
+                                                <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                                                <div className="h-3 w-40 bg-gray-200 rounded"></div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="space-y-2">
+                                                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                                                <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-8 w-28 bg-gray-200 rounded-lg"></div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                    
+                    {!loading && payments.length === 0 && (
+                        <div className="py-12 text-center">
+                            <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <CreditCard className="h-8 w-8 text-gray-400" />
                             </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No payments found</h3>
+                            <p className="text-gray-500 max-w-md mx-auto">
+                                {searchTerm || statusFilter
+                                    ? "Try adjusting your search or filter to find what you're looking for."
+                                    : "No payment records found."}
+                            </p>
                         </div>
-                        <div className="h-16 w-16 rounded-[2.5rem] bg-emerald-50 flex items-center justify-center text-emerald-500 border border-emerald-100 group-hover:scale-110 transition-transform">
-                            <DollarSign className="h-8 w-8" />
-                        </div>
-                    </div>
-                    <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-all">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Processed Transactions</p>
-                            <p className="text-4xl font-black text-gray-900 leading-none">{stats.successCount}</p>
-                            <div className="mt-4 flex items-center gap-2">
-                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Global Settlements</span>
-                            </div>
-                        </div>
-                        <div className="h-16 w-16 rounded-[2.5rem] bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100 group-hover:scale-110 transition-transform">
-                            <TrendingUp className="h-8 w-8" />
-                        </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Payments Table */}
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden min-h-[500px] flex flex-col">
-                    <div className="overflow-x-auto flex-1">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#F8FAFC]">
-                                <tr>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Transaction ID</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Sender Entity</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-center">Status Matrix</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Settlement</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Operation</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {!loading ? (
-                                    payments.map((payment) => (
-                                        <tr key={payment.id} className="hover:bg-slate-50/50 transition-all group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="h-11 w-11 rounded-2xl bg-[#F8FAFC] flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm outline outline-1 outline-transparent group-hover:outline-blue-100">
-                                                        <CreditCard className="h-5 w-5" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-black text-gray-900 text-sm tracking-tighter uppercase">{payment.orderId.substring(0, 15)}...</p>
-                                                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{new Date(payment.createdAt).toLocaleDateString()} @ {new Date(payment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <Link href={`/admin/users/${payment.user?.id}`} className="flex flex-col group/user">
-                                                    <p className="text-xs font-black text-gray-800 group-hover/user:text-blue-600 transition-colors uppercase tracking-tight flex items-center gap-2">
-                                                        {payment.user?.name || 'Anonymous User'} <ExternalLink className="h-3 w-3 opacity-0 group-hover/user:opacity-100 transition-all" />
-                                                    </p>
-                                                    <p className="text-[10px] text-gray-400 font-bold lowercase">{payment.user?.email}</p>
-                                                </Link>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex justify-center">
-                                                    <div className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2 shadow-sm ${payment.status === 'SUCCESS' ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' :
-                                                            payment.status === 'FAILED' ? 'text-red-500 bg-red-50 border border-red-100' :
-                                                                'text-amber-600 bg-amber-50 border border-amber-100'
-                                                        }`}>
-                                                        {payment.status === 'SUCCESS' ? <CheckCircle2 className="h-2.5 w-2.5" /> :
-                                                            payment.status === 'FAILED' ? <XCircle className="h-2.5 w-2.5" /> :
-                                                                <Clock className="h-2.5 w-2.5 animate-pulse" />}
-                                                        {payment.status}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <p className="text-sm font-black text-gray-900">${payment.amount}</p>
-                                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{payment.currency}</p>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <Link href={`/admin/users/${payment.user?.id}`} className="inline-flex items-center gap-2 text-[10px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-widest transition-all group/btn">
-                                                    Trace Entity <ArrowRight className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    [...Array(5)].map((_, i) => (
-                                        <tr key={i} className="animate-pulse">
-                                            <td className="px-8 py-6"><div className="h-12 w-56 bg-gray-50 rounded-2xl"></div></td>
-                                            <td className="px-8 py-6"><div className="h-10 w-40 bg-gray-50 rounded-xl"></div></td>
-                                            <td className="px-8 py-6"><div className="h-7 w-28 bg-gray-50 rounded-xl mx-auto"></div></td>
-                                            <td className="px-8 py-6 text-right"><div className="h-10 w-24 bg-gray-50 rounded-xl ml-auto"></div></td>
-                                            <td className="px-8 py-6 text-right"><div className="h-10 w-28 bg-gray-50 rounded-xl ml-auto"></div></td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-
-                        {!loading && payments.length === 0 && (
-                            <div className="flex-1 flex flex-col items-center justify-center py-32">
-                                <div className="h-20 w-20 bg-gray-50 rounded-[2.5rem] flex items-center justify-center border border-gray-100 text-gray-200 mb-6 group hover:rotate-12 transition-transform duration-500">
-                                    <CreditCard className="h-10 w-10" />
-                                </div>
-                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] font-sans">Zero Financial Traces</h3>
-                                <p className="text-[10px] text-gray-300 font-bold uppercase tracking-widest mt-2 italic font-sans text-center px-10">Adjust filters or search parameters to locate specifically settled records.</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="px-8 py-6 border-t border-gray-50 bg-[#F8FAFC]/50 flex items-center justify-between">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            SHOWING <span className="text-gray-900">{payments.length}</span> OF <span className="text-gray-900">{pagination.total}</span> AUDITS
-                        </p>
-
+                {/* Pagination */}
+                {pagination.totalPages > 0 && (
+                    <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                            Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
+                            <span className="font-medium">
+                                {Math.min(pagination.page * pagination.limit, pagination.total)}
+                            </span>{' '}
+                            of <span className="font-medium">{pagination.total}</span> payments
+                        </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => handlePageChange(pagination.page - 1)}
                                 disabled={pagination.page === 1 || loading}
-                                className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 disabled:opacity-30 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                <ChevronLeft className="h-3.5 w-3.5" /> Previous
+                                Previous
                             </button>
+                            <div className="flex items-center gap-1">
+                                {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
+                                    const pageNum = Math.max(1, Math.min(pagination.totalPages - 4, pagination.page - 2)) + i;
+                                    if (pageNum > pagination.totalPages) return null;
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            className={`h-8 w-8 flex items-center justify-center rounded-lg text-sm font-medium ${
+                                                pagination.page === pageNum
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
+                                            } transition-colors`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                             <button
                                 onClick={() => handlePageChange(pagination.page + 1)}
                                 disabled={pagination.page === pagination.totalPages || loading}
-                                className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 disabled:opacity-30 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                Next <ChevronRight className="h-3.5 w-3.5" />
+                                Next
                             </button>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
