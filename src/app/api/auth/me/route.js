@@ -36,6 +36,7 @@ export async function GET() {
                 state: true,
                 postalCode: true,
                 country: true,
+                role: true,
             },
         });
 

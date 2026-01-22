@@ -3,7 +3,7 @@ import { jwtVerify } from 'jose';
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 
-export async function middleware(request) {
+export async function proxy(request) {
     const { pathname } = request.nextUrl;
     const token = request.cookies.get('auth_token')?.value;
 

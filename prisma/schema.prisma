@@ -45,6 +45,7 @@ model Payment {
   metadata      Json?    // Store raw response from provider
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  purchases     Purchase[]
 }
 
 model Purchase {
@@ -56,6 +57,8 @@ model Purchase {
   itemPrice Float
   type      String?  // SERVICE, CAREER_PACKAGE, etc.
   status    String   @default("ACTIVE")
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
