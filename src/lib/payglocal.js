@@ -59,16 +59,8 @@ const ERROR_MESSAGES = {
 
 function getKeys() {
   try {
-    const privateKeyPath = process.env.PRIVATE_KEY_PATH
-      ? path.resolve(process.cwd(), process.env.PRIVATE_KEY_PATH)
-      : PRIVATE_KEY_PATH;
-
-    const publicKeyPath = process.env.PUBLIC_KEY_PATH
-      ? path.resolve(process.cwd(), process.env.PUBLIC_KEY_PATH)
-      : PUBLIC_KEY_PATH;
-
-    const privateKey = fs.readFileSync(privateKeyPath, "utf8");
-    const publicKey = fs.readFileSync(publicKeyPath, "utf8");
+    const privateKey = fs.readFileSync(PRIVATE_KEY_PATH, "utf8");
+    const publicKey = fs.readFileSync(PUBLIC_KEY_PATH, "utf8");
 
     return { privateKey, publicKey };
   } catch (err) {
