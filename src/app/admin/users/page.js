@@ -7,6 +7,13 @@ import {
     ChevronRight,
     ChevronLeft,
     RefreshCw,
+    Filter,
+    User,
+    Shield,
+    Calendar,
+    DollarSign,
+    MoreVertical,
+    Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -48,7 +55,7 @@ const UsersPage = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchUsers(1);
-        }, 300); // Debounce search
+        }, 300);
         return () => clearTimeout(timer);
     }, [searchTerm, roleFilter, fetchUsers]);
 
@@ -59,157 +66,248 @@ const UsersPage = () => {
     };
 
     return (
-        <div className="animate-in fade-in duration-700 max-w-[1400px] mx-auto min-h-screen pb-20 font-sans">
-            <div className="space-y-10">
-                {/* Refined Header */}
-                <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tighter">User Directory</h1>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] mt-1 italic">Enterprise Management Matrix</p>
-                    </div>
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+                    <p className="text-gray-600 mt-1">Manage and monitor user accounts</p>
+                </div>
+                {/* <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200">
+                        Export Users
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 rounded-lg transition-colors">
+                        + Add User
+                    </button>
+                </div> */}
+            </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-4 focus-within:ring-blue-50 transition-all">
-                            <Search className="h-4 w-4 text-gray-300" />
+            {/* Filters */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-1">
+                        <div className="relative max-w-md">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search..."
+                                placeholder="Search users by name or email..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-transparent border-none outline-none text-[11px] font-bold text-gray-600 w-48 uppercase tracking-widest"
+                                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-
+                    </div>
+                    <div className="flex items-center gap-3">
                         <select
                             value={roleFilter}
                             onChange={(e) => setRoleFilter(e.target.value)}
-                            className="h-10 px-4 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 transition-all shadow-sm text-gray-500 cursor-pointer"
+                            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[140px]"
                         >
-                            <option value="">Global Roles</option>
-                            <option value="ADMIN">Master Admins</option>
-                            <option value="USER">Standard Users</option>
+                            <option value="">All Roles</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="USER">User</option>
                         </select>
-
-                        <button onClick={() => fetchUsers(1)} className="h-10 w-10 flex items-center justify-center bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-sm">
-                            <RefreshCw className={`h-3.5 w-3.5 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+                        <button
+                            onClick={() => fetchUsers(1)}
+                            className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            disabled={loading}
+                        >
+                            <RefreshCw className={`h-4 w-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
+            </div>
 
-                {/* Users Matrix */}
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#F8FAFC]">
-                                <tr>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Identity Profile</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Auth Role</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Timeline</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Asset Yield</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Operation</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {!loading ? (
-                                    users.map((user) => (
-                                        <tr key={user.id} className="hover:bg-slate-50/50 transition-all group">
-                                            <td className="px-8 py-6">
-                                                <Link href={`/admin/users/${user.id}`} className="flex items-center gap-5">
-                                                    <div className="h-12 w-12 rounded-2xl bg-[#F8FAFC] text-blue-600 flex items-center justify-center font-black text-sm border border-gray-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white group-hover:scale-105 transition-all duration-300">
-                                                        {user.name?.[0] || user.email?.[0]?.toUpperCase()}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-black text-gray-800 text-sm tracking-tight mb-0.5">{user.name || 'Anonymous'}</p>
-                                                        <p className="text-[10px] text-gray-400 font-bold transition-colors group-hover:text-gray-500">{user.email}</p>
-                                                    </div>
-                                                </Link>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] ${user.role === 'ADMIN' ? 'text-indigo-600 bg-indigo-50 border border-indigo-100' : 'text-gray-400 bg-gray-50 border border-gray-100'
-                                                    }`}>
-                                                    {user.role}
-                                                </span>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{new Date(user.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[11px] font-black text-gray-800 uppercase tracking-tight">{user._count?.purchases || 0} Assets</span>
-                                                        <span className="text-[9px] text-emerald-500 font-black uppercase tracking-[0.25em]">{user._count?.payments || 0} Paid</span>
-                                                    </div>
+            {/* Users Table */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-gray-200 bg-gray-50">
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    User
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Role
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Joined
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Purchases
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {!loading ? (
+                                users.map((user) => (
+                                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="py-4 px-6">
+                                            <Link href={`/admin/users/${user.id}`} className="flex items-center gap-3 group">
+                                                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm">
+                                                    {user.name?.[0] || user.email?.[0]?.toUpperCase()}
                                                 </div>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <Link href={`/admin/users/${user.id}`} className="h-10 w-10 inline-flex items-center justify-center rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-blue-200 transition-all text-gray-300 hover:text-blue-600 bg-[#F8FAFC] border border-transparent hover:border-blue-100 ml-auto">
-                                                    <ChevronRight className="h-4 w-4" />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600">
+                                                        {user.name || 'No Name'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">{user.email}</p>
+                                                </div>
+                                            </Link>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                                user.role === 'ADMIN'
+                                                    ? 'bg-purple-100 text-purple-800'
+                                                    : 'bg-gray-100 text-gray-800'
+                                            }`}>
+                                                {user.role === 'ADMIN' ? (
+                                                    <>
+                                                        <Shield className="h-3 w-3 mr-1" />
+                                                        Admin
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <User className="h-3 w-3 mr-1" />
+                                                        User
+                                                    </>
+                                                )}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Calendar className="h-4 w-4 text-gray-400" />
+                                                {new Date(user.createdAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-2">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {user._count?.purchases || 0} orders
+                                                </div>
+                                                {user._count?.payments > 0 && (
+                                                    <div className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
+                                                        <DollarSign className="h-3 w-3" />
+                                                        {user._count?.payments} paid
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-2">
+                                                <Link
+                                                    href={`/admin/users/${user.id}`}
+                                                    className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                                                >
+                                                    View
                                                 </Link>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    [...Array(5)].map((_, i) => (
-                                        <tr key={i} className="animate-pulse">
-                                            <td className="px-8 py-6"><div className="h-12 w-48 bg-gray-50 rounded-2xl"></div></td>
-                                            <td className="px-8 py-6"><div className="h-4 w-16 bg-gray-50 rounded-lg"></div></td>
-                                            <td className="px-8 py-6"><div className="h-4 w-24 bg-gray-50 rounded-lg"></div></td>
-                                            <td className="px-8 py-6"><div className="h-8 w-20 bg-gray-50 rounded-lg"></div></td>
-                                            <td className="px-8 py-6 text-right"><div className="h-10 w-10 bg-gray-50 rounded-2xl ml-auto"></div></td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                        {!loading && users.length === 0 && (
-                            <div className="py-32 text-center bg-white">
-                                <div className="h-16 w-16 bg-gray-50 text-gray-200 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-gray-100">
-                                    <Users className="h-8 w-8" />
-                                </div>
-                                <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Matrix Empty</p>
+                                                <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                                                <div className="space-y-2">
+                                                    <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                                                    <div className="h-3 w-40 bg-gray-200 rounded"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-8 w-16 bg-gray-200 rounded-lg"></div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                    
+                    {!loading && users.length === 0 && (
+                        <div className="py-12 text-center">
+                            <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <Users className="h-8 w-8 text-gray-400" />
                             </div>
-                        )}
-                    </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                            <p className="text-gray-500 max-w-md mx-auto">
+                                {searchTerm || roleFilter
+                                    ? "Try adjusting your search or filter to find what you're looking for."
+                                    : "No users have been added yet."}
+                            </p>
+                        </div>
+                    )}
+                </div>
 
-                    <div className="px-8 py-6 border-t border-gray-50 bg-[#F8FAFC]/50 flex items-center justify-between">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            SHOWING <span className="text-gray-900">{users.length}</span> OF <span className="text-gray-900">{pagination.total}</span> ENTITIES
-                        </p>
-
+                {/* Pagination */}
+                {pagination.totalPages > 0 && (
+                    <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                            Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
+                            <span className="font-medium">
+                                {Math.min(pagination.page * pagination.limit, pagination.total)}
+                            </span>{' '}
+                            of <span className="font-medium">{pagination.total}</span> users
+                        </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => handlePageChange(pagination.page - 1)}
                                 disabled={pagination.page === 1 || loading}
-                                className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-400 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                <ChevronLeft className="h-3.5 w-3.5" /> Previous
+                                Previous
                             </button>
-
-                            <div className="flex items-center gap-1 mx-2">
-                                {[...Array(pagination.totalPages)].map((_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        onClick={() => handlePageChange(i + 1)}
-                                        className={`h-10 w-10 flex items-center justify-center rounded-2xl text-[10px] font-black transition-all ${pagination.page === i + 1
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 scale-105'
-                                                : 'text-gray-400 hover:bg-white hover:text-gray-900'
-                                            }`}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
+                            <div className="flex items-center gap-1">
+                                {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
+                                    const pageNum = Math.max(1, Math.min(pagination.totalPages - 4, pagination.page - 2)) + i;
+                                    if (pageNum > pagination.totalPages) return null;
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            className={`h-8 w-8 flex items-center justify-center rounded-lg text-sm font-medium ${
+                                                pagination.page === pageNum
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
+                                            } transition-colors`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
                             </div>
-
                             <button
                                 onClick={() => handlePageChange(pagination.page + 1)}
                                 disabled={pagination.page === pagination.totalPages || loading}
-                                className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-400 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                Next <ChevronRight className="h-3.5 w-3.5" />
+                                Next
                             </button>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

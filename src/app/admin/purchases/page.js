@@ -7,29 +7,45 @@ import {
     ChevronRight,
     ChevronLeft,
     RefreshCw,
-    CreditCard,
     DollarSign,
     TrendingUp,
-    ExternalLink,
     User,
     Clock,
-    CheckCircle2,
-    XCircle,
-    ArrowRight
+    CheckCircle,
+    Filter,
+    MoreVertical,
+    Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
 const PurchasesPage = () => {
     const [purchases, setPurchases] = useState([]);
-    const [stats, setStats] = useState({ totalRevenue: 0, totalOrders: 0, successfulPayments: 0 });
+    const [stats, setStats] = useState({ 
+        totalRevenue: 0, 
+        totalOrders: 0, 
+        successfulPayments: 0 
+    });
     const [loading, setLoading] = useState(true);
-    const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 });
+    const [pagination, setPagination] = useState({ 
+        page: 1, 
+        limit: 10, 
+        total: 0, 
+        totalPages: 0 
+    });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
 
     const fetchPurchases = useCallback(async (page = 1) => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/admin/purchases?page=${page}&limit=10`);
+            const query = new URLSearchParams({
+                page: page.toString(),
+                limit: '10',
+                search: searchTerm,
+                status: statusFilter
+            });
+            const res = await fetch(`/api/admin/purchases?${query.toString()}`);
             const data = await res.json();
             if (data.purchases) {
                 setPurchases(data.purchases);
@@ -41,11 +57,14 @@ const PurchasesPage = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [searchTerm, statusFilter]);
 
     useEffect(() => {
-        fetchPurchases(1);
-    }, [fetchPurchases]);
+        const timer = setTimeout(() => {
+            fetchPurchases(1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm, statusFilter, fetchPurchases]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagination.totalPages) {
@@ -53,162 +72,321 @@ const PurchasesPage = () => {
         }
     };
 
-    return (
-        <div className="animate-in fade-in duration-700 max-w-[1400px] mx-auto min-h-screen pb-20 font-sans">
-            <div className="space-y-10">
-                {/* Header */}
-                <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tighter">Purchases Matrix</h1>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] mt-1 italic">Financial Inventory & Order Audit</p>
-                    </div>
+    const totalRevenue = purchases.reduce((sum, purchase) => {
+        return sum + (purchase.payment?.status === 'SUCCESS' ? purchase.itemPrice : 0);
+    }, 0);
 
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Purchases</h1>
+                    <p className="text-gray-600 mt-1">Manage and monitor customer orders</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200">
+                        Export Orders
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 rounded-lg transition-colors">
+                        New Order
+                    </button>
+                </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Total Revenue</p>
+                            <p className="text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString()}</p>
+                        </div>
+                        <div className="h-12 w-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <DollarSign className="h-6 w-6 text-emerald-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-emerald-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>From successful payments</span>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Total Orders</p>
+                            <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+                        </div>
+                        <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <ShoppingBag className="h-6 w-6 text-blue-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-blue-600">
+                        <ShoppingBag className="h-4 w-4" />
+                        <span>All purchases</span>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500">Success Rate</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                                {purchases.length > 0 
+                                    ? `${Math.round((purchases.filter(p => p.payment?.status === 'SUCCESS').length / purchases.length) * 100)}%`
+                                    : '0%'
+                                }
+                            </p>
+                        </div>
+                        <div className="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <TrendingUp className="h-6 w-6 text-indigo-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-indigo-600">
+                        <TrendingUp className="h-4 w-4" />
+                        <span>Payment success rate</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-1">
+                        <div className="relative max-w-md">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search orders by product or customer..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                        </div>
+                    </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={() => fetchPurchases(pagination.page)} className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-sm text-[10px] font-black uppercase tracking-widest text-gray-500">
-                            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Sync Live
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[140px]"
+                        >
+                            <option value="">All Status</option>
+                            <option value="SUCCESS">Success</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="FAILED">Failed</option>
+                        </select>
+                        <button
+                            onClick={() => fetchPurchases(1)}
+                            className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            disabled={loading}
+                        >
+                            <RefreshCw className={`h-4 w-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
+            </div>
 
-                {/* Statistics Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-all">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Booked Revenue</p>
-                            <p className="text-3xl font-black text-gray-900">${stats.totalRevenue.toLocaleString()}</p>
+            {/* Purchases Table */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-gray-200 bg-gray-50">
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Product
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Customer
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {!loading ? (
+                                purchases.map((purchase) => (
+                                    <tr key={purchase.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                    <ShoppingBag className="h-5 w-5 text-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">{purchase.itemName}</p>
+                                                    <p className="text-xs text-gray-500">{purchase.type || 'Standard'}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <Link 
+                                                href={`/admin/users/${purchase.user?.id}`}
+                                                className="group"
+                                            >
+                                                <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600">
+                                                    {purchase.user?.name || 'Unknown User'}
+                                                </p>
+                                                <p className="text-xs text-gray-500">{purchase.user?.email}</p>
+                                            </Link>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <p className="text-sm text-gray-600">
+                                                {new Date(purchase.createdAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </p>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                                purchase.payment?.status === 'SUCCESS'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : purchase.payment?.status === 'PENDING'
+                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-red-100 text-red-800'
+                                            }`}>
+                                                {purchase.payment?.status === 'SUCCESS' ? (
+                                                    <>
+                                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                                        Success
+                                                    </>
+                                                ) : purchase.payment?.status === 'PENDING' ? (
+                                                    <>
+                                                        <Clock className="h-3 w-3 mr-1" />
+                                                        Pending
+                                                    </>
+                                                ) : (
+                                                    'Failed'
+                                                )}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <p className="text-sm font-semibold text-gray-900">${purchase.itemPrice}</p>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-2">
+                                                <Link
+                                                    href={`/admin/users/${purchase.user?.id}`}
+                                                    className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                                                >
+                                                    View Customer
+                                                </Link>
+                                                <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                                                <div className="space-y-2">
+                                                    <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                                                    <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="space-y-2">
+                                                <div className="h-4 w-40 bg-gray-200 rounded"></div>
+                                                <div className="h-3 w-32 bg-gray-200 rounded"></div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="h-8 w-28 bg-gray-200 rounded-lg"></div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                    
+                    {!loading && purchases.length === 0 && (
+                        <div className="py-12 text-center">
+                            <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <ShoppingBag className="h-8 w-8 text-gray-400" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No purchases found</h3>
+                            <p className="text-gray-500 max-w-md mx-auto">
+                                {searchTerm || statusFilter
+                                    ? "Try adjusting your search or filter to find what you're looking for."
+                                    : "No purchases have been made yet."}
+                            </p>
                         </div>
-                        <div className="h-14 w-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 border border-emerald-100 group-hover:scale-110 transition-transform">
-                            <DollarSign className="h-6 w-6" />
-                        </div>
-                    </div>
-                    <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-all">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Active Deliverables</p>
-                            <p className="text-3xl font-black text-gray-900">{stats.totalOrders}</p>
-                        </div>
-                        <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100 group-hover:scale-110 transition-transform">
-                            <ShoppingBag className="h-6 w-6" />
-                        </div>
-                    </div>
-                    <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-all">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Successful Payments</p>
-                            <p className="text-3xl font-black text-gray-900">${stats.successfulPayments.toLocaleString()}</p>
-                        </div>
-                        <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 border border-indigo-100 group-hover:scale-110 transition-transform">
-                            <TrendingUp className="h-6 w-6" />
-                        </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Purchases Table */}
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden min-h-[500px] flex flex-col">
-                    <div className="overflow-x-auto flex-1">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#F8FAFC]">
-                                <tr>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Purchased Item</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Customer Entity</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-center">Payment Status</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Value</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {!loading ? (
-                                    purchases.map((purchase) => (
-                                        <tr key={purchase.id} className="hover:bg-slate-50/50 transition-all group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
-                                                        <ShoppingBag className="h-4 w-4" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-black text-gray-800 text-sm tracking-tight">{purchase.itemName}</p>
-                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{purchase.type || 'Standard Service'}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <Link href={`/admin/users/${purchase.user?.id}`} className="flex flex-col group/user">
-                                                    <p className="text-xs font-black text-gray-700 group-hover/user:text-blue-600 transition-colors uppercase tracking-tight flex items-center gap-1.5">
-                                                        {purchase.user?.name || 'Unknown User'} <ExternalLink className="h-2.5 w-2.5 opacity-0 group-hover/user:opacity-100 transition-all" />
-                                                    </p>
-                                                    <p className="text-[10px] text-gray-400 font-bold lowercase">{purchase.user?.email}</p>
-                                                </Link>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex flex-col items-center">
-                                                    <div className={`px-4 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-2 transition-all shadow-sm ${purchase.payment?.status === 'SUCCESS' ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' : 'text-amber-600 bg-amber-50 border border-amber-100'
-                                                        }`}>
-                                                        {purchase.payment?.status === 'SUCCESS' ? <CheckCircle2 className="h-2.5 w-2.5" /> : <Clock className="h-2.5 w-2.5 animate-pulse" />}
-                                                        {purchase.payment?.status || 'PENDING'}
-                                                    </div>
-                                                    {purchase.payment?.orderId && (
-                                                        <span className="text-[8px] text-gray-400 font-black mt-2 uppercase tracking-tighter opacity-60">ID: {purchase.payment.orderId.substring(0, 10)}...</span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <p className="text-sm font-black text-gray-900">${purchase.itemPrice}</p>
-                                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{new Date(purchase.createdAt).toLocaleDateString()}</p>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <Link href={`/admin/users/${purchase.user?.id}`} className="inline-flex items-center gap-2 text-[10px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-widest transition-all group/btn">
-                                                    Audit Entity <ArrowRight className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    [...Array(5)].map((_, i) => (
-                                        <tr key={i} className="animate-pulse">
-                                            <td className="px-8 py-6"><div className="h-12 w-48 bg-gray-50 rounded-2xl"></div></td>
-                                            <td className="px-8 py-6"><div className="h-10 w-40 bg-gray-50 rounded-xl"></div></td>
-                                            <td className="px-8 py-6"><div className="h-6 w-24 bg-gray-50 rounded-lg mx-auto"></div></td>
-                                            <td className="px-8 py-6 text-right"><div className="h-10 w-20 bg-gray-50 rounded-xl ml-auto"></div></td>
-                                            <td className="px-8 py-6 text-right"><div className="h-10 w-24 bg-gray-50 rounded-xl ml-auto"></div></td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-
-                        {!loading && purchases.length === 0 && (
-                            <div className="flex-1 flex flex-col items-center justify-center py-32">
-                                <div className="h-20 w-20 bg-gray-50 rounded-[2.5rem] flex items-center justify-center border border-gray-100 text-gray-200 mb-6 rotate-12 group hover:rotate-0 transition-transform duration-500">
-                                    <ShoppingBag className="h-10 w-10" />
-                                </div>
-                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">No Purchase Records</h3>
-                                <p className="text-[10px] text-gray-300 font-bold uppercase tracking-widest mt-2 italic">The matrix is currently empty</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="px-8 py-6 border-t border-gray-50 bg-[#F8FAFC]/50 flex items-center justify-between">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            PAGE <span className="text-gray-900">{pagination.page}</span> OF <span className="text-gray-900">{pagination.totalPages}</span> INDEXES
-                        </p>
-
+                {/* Pagination */}
+                {pagination.totalPages > 0 && (
+                    <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                            Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
+                            <span className="font-medium">
+                                {Math.min(pagination.page * pagination.limit, pagination.total)}
+                            </span>{' '}
+                            of <span className="font-medium">{pagination.total}</span> orders
+                        </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => handlePageChange(pagination.page - 1)}
                                 disabled={pagination.page === 1 || loading}
-                                className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 disabled:opacity-30 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                <ChevronLeft className="h-3.5 w-3.5" /> Previous
+                                Previous
                             </button>
+                            <div className="flex items-center gap-1">
+                                {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
+                                    const pageNum = Math.max(1, Math.min(pagination.totalPages - 4, pagination.page - 2)) + i;
+                                    if (pageNum > pagination.totalPages) return null;
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            className={`h-8 w-8 flex items-center justify-center rounded-lg text-sm font-medium ${
+                                                pagination.page === pageNum
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
+                                            } transition-colors`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                             <button
                                 onClick={() => handlePageChange(pagination.page + 1)}
                                 disabled={pagination.page === pagination.totalPages || loading}
-                                className="h-10 px-4 flex items-center gap-2 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 disabled:opacity-30 transition-all shadow-sm"
+                                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                Next <ChevronRight className="h-3.5 w-3.5" />
+                                Next
                             </button>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
