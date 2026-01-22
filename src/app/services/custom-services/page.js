@@ -37,7 +37,7 @@ const MOCK_CUSTOM_SERVICES = [
       "Direct Access to Senior Mentors (2 sessions)",
       "Customized Interview Preparation",
       "Priority Support via Email",
-      "Curated Job Referrals (5/month)",
+      "Curated Job Referrals",
     ],
     color: "blue",
     badge: "Starter",

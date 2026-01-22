@@ -520,9 +520,9 @@ const CareerPackages = () => {
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-2">
                       {/* <span className="text-gray-600">Flexible Payment:</span> */}
-                      <span className="font-semibold">
+                      {/* <span className="font-semibold">
                         ${plan.installment}/month
-                      </span>
+                      </span> */}
                     </div>
                     {/* <div className="text-xs text-gray-500 text-center">
                       4 Easy Installments
