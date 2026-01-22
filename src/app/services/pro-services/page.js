@@ -521,7 +521,7 @@ const ProServices = () => {
                       <div className="text-gray-400 line-through">${selectedService.originalPrice}</div>
                     )}
                   </div>
-                  <div className="space-x-3">
+                  <div className="space-x-1">
                     <Button
                       onClick={() => {
                         handleAddToCart(selectedService);

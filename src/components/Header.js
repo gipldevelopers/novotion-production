@@ -330,7 +330,7 @@ const Header = () => {
               )}
 
               <Link href="/contact#contact-form" onClick={() => setIsOpen(false)}>
-                <Button className="btn-primary w-full py-3 font-medium rounded-lg">
+                <Button className="btn-primary w-full py-3 font-medium mt-4 rounded-lg">
                   Get Started
                 </Button>
               </Link>

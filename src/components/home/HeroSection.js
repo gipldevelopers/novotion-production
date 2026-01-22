@@ -115,7 +115,7 @@ const HeroSection = () => {
   const currentSlideData = slides[currentSlide];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-white overflow-hidden pt-15 md:pt-15">
+    <section className="relative min-h-screen flex items-center justify-center bg-white overflow-hidden pt-15 mt-10 md:pt-15">
 
       {/* Soft Brand Background Bubbles - Mobile Optimized */}
       <div className="absolute inset-0">
