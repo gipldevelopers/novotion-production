@@ -64,14 +64,15 @@ model Purchase {
 }
 
 model ContactMessage {
-  id        String   @id @default(cuid())
-  fullName  String
-  email     String
-  phone     String?
-  company   String?
-  userType  String?
-  message   String
-  status    String   @default("UNREAD") // UNREAD, READ, REPLIED
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  fullName   String
+  email      String
+  phone      String?
+  company    String?
+  userType   String?
+  message    String
+  adminNotes String?
+  status     String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
