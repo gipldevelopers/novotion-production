@@ -49,7 +49,7 @@ const TermsAndConditionsPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Basic Plan</h3>
                     <ul className="list-disc list-inside space-y-2 ml-4">
                       <li><strong>Enrollment Fee:</strong> $2,500 (due at enrollment)</li>
-                      <li><strong>Flexible Payment:</strong> 4 easy installments</li>
+                      {/* <li><strong>Flexible Payment:</strong> 4 easy installments</li> */}
                       <li>
                         <strong>Includes:</strong> One-on-one consultation, 10 curated interview
                         opportunities, 2 complimentary proxy interviews, resume optimization,
@@ -67,7 +67,7 @@ const TermsAndConditionsPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Standard Plan</h3>
                     <ul className="list-disc list-inside space-y-2 ml-4">
                       <li><strong>Enrollment Fee:</strong> $3,500 (due at enrollment)</li>
-                      <li><strong>Flexible Payment:</strong> 4 easy installments</li>
+                      {/* <li><strong>Flexible Payment:</strong> 4 easy installments</li> */}
                       <li>
                         <strong>Includes:</strong> 15 interview opportunities, 2 proxy interviews,
                         personalized resume rebuild, mock interviews, recruiter network
@@ -84,7 +84,7 @@ const TermsAndConditionsPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Advanced Plan</h3>
                     <ul className="list-disc list-inside space-y-2 ml-4">
                       <li><strong>Enrollment Fee:</strong> $4,000 (due at enrollment)</li>
-                      <li><strong>Flexible Payment:</strong> 4 easy installments</li>
+                      {/* <li><strong>Flexible Payment:</strong> 4 easy installments</li> */}
                       <li>
                         <strong>Includes:</strong> 18 interview opportunities, unlimited proxy interviews,
                         intensive coaching, real-time sessions, LinkedIn optimization, and
@@ -101,7 +101,7 @@ const TermsAndConditionsPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Premium Plan</h3>
                     <ul className="list-disc list-inside space-y-2 ml-4">
                       <li><strong>Enrollment Fee:</strong> $5,000 (due at enrollment)</li>
-                      <li><strong>Flexible Payment:</strong> 4 easy installments</li>
+                      {/* <li><strong>Flexible Payment:</strong> 4 easy installments</li> */}
                       <li>
                         <strong>Includes:</strong> 22 interviews, unlimited proxy support, lifetime resume
                         updates, 24/7 portal access, direct hiring manager introductions, and

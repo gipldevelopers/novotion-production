@@ -7,9 +7,7 @@ import {
   CreditCard,
   MessageSquare,
   Settings,
-  ArrowRight,
   UserPlus,
-  FileText,
   TrendingUp,
   DollarSign,
   Package,
@@ -18,9 +16,11 @@ import {
   CheckCircle,
   ChevronRight,
   Eye,
-  MoreVertical,
+  RefreshCw,
+  User,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -30,346 +30,243 @@ const AdminDashboard = () => {
     pendingInquiries: 0,
   });
 
+  const [recentPurchases, setRecentPurchases] = useState([]);
+  const [recentMessages, setRecentMessages] = useState([]);
+  const [loading, setLoading] = useState({
+    stats: true,
+    purchases: true,
+    messages: true,
+  });
+
   useEffect(() => {
-    setStats({
-      totalUsers: 142,
-      totalPurchases: 89,
-      totalRevenue: 12450,
-      pendingInquiries: 5,
-    });
+    fetchDashboardData();
   }, []);
 
+  const fetchDashboardData = async () => {
+    try {
+      setLoading({ stats: true, purchases: true, messages: true });
+
+      const statsRes = await fetch("/api/admin/dashboard/stats");
+      const statsData = await statsRes.json();
+      if (statsRes.ok) setStats(statsData);
+
+      const purchasesRes = await fetch("/api/admin/purchases?page=1&limit=4");
+      const purchasesData = await purchasesRes.json();
+      if (purchasesRes.ok) setRecentPurchases(purchasesData.purchases);
+
+      const messagesRes = await fetch(
+        "/api/admin/messages?page=1&limit=3&status=NEW",
+      );
+      const messagesData = await messagesRes.json();
+      if (messagesRes.ok) setRecentMessages(messagesData.messages);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading({ stats: false, purchases: false, messages: false });
+    }
+  };
+
   const StatCard = ({ title, value, icon: Icon, color, trend }) => (
-    <div className="bg-white p-5 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
-      <div className="flex items-start justify-between mb-3">
+    <div className="bg-white p-5 rounded-xl border hover:shadow-sm transition-all">
+      <div className="flex justify-between mb-3">
         <div>
-          <p className="text-sm text-gray-500 mb-1">{title}</p>
-          <h3 className="text-2xl font-bold text-gray-900">
-            {title.includes("Revenue")
-              ? `$${value.toLocaleString()}`
-              : value.toLocaleString()}
+          <p className="text-sm text-gray-500">{title}</p>
+          <h3 className="text-2xl font-bold">
+            {title.includes("Revenue") ? `$${value.toLocaleString()}` : value}
           </h3>
         </div>
-        <div className={`p-2 rounded-lg ${color.replace('text-', 'bg-')} bg-opacity-10`}>
-          <Icon className={`h-5 w-5 ${color}`} />
+        <div
+          className={`p-3 rounded-xl ${color.replace("text-", "text-")} bg-opacity-15`}
+        >
+          <Icon className={`h-6 w-6 ${color}`} />
         </div>
       </div>
+
       {trend && (
-        <div className="flex items-center gap-1 text-xs">
-          <TrendingUp className="h-3 w-3 text-green-500" />
-          <span className="text-green-600 font-medium">{trend}</span>
-          <span className="text-gray-400 ml-1">from last month</span>
+        <div className="flex items-center text-xs text-green-600 gap-1">
+          <TrendingUp className="h-3 w-3" />
+          {trend} <span className="text-gray-400">from last month</span>
         </div>
       )}
     </div>
   );
 
-  const recentPurchases = [
-    {
-      id: "1",
-      user: "John Doe",
-      email: "john@example.com",
-      item: "Custom Elite Package",
-      amount: 1000,
-      date: "Jan 22, 2024",
-      status: "Completed",
-    },
-    {
-      id: "2",
-      user: "Sarah Smith",
-      email: "sarah@example.com",
-      item: "Resume Upgrade Pro",
-      amount: 299,
-      date: "Jan 21, 2024",
-      status: "Pending",
-    },
-    {
-      id: "3",
-      user: "Michael Brown",
-      email: "michael@example.com",
-      item: "Standard Plan (CAP)",
-      amount: 3500,
-      date: "Jan 21, 2024",
-      status: "Completed",
-    },
-    {
-      id: "4",
-      user: "Emma Wilson",
-      email: "emma@example.com",
-      item: "Career Support",
-      amount: 499,
-      date: "Jan 20, 2024",
-      status: "Processing",
-    },
-  ];
-
-  const recentMessages = [
-    {
-      id: "1",
-      sender: "Alex Rivera",
-      subject: "Inquiry about RPO services",
-      time: "2 hours ago",
-      read: false,
-    },
-    {
-      id: "2",
-      sender: "Elena G.",
-      subject: "Career Support help needed",
-      time: "5 hours ago",
-      read: false,
-    },
-    {
-      id: "3",
-      sender: "Global Tech Inc",
-      subject: "Enterprise Package inquiry",
-      time: "1 day ago",
-      read: true,
-    },
-  ];
-
   const QuickAction = ({ href, icon: Icon, title, description, color }) => (
     <Link
       href={href}
-      className="group p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all flex items-start gap-3"
+      className="flex items-center gap-3 p-4 bg-white border rounded-xl hover:shadow-sm transition"
     >
-      <div className={`p-2 rounded-lg ${color.replace('text-', 'bg-')} bg-opacity-10 shrink-0`}>
-        <Icon className={`h-5 w-5 ${color}`} />
+      <div
+        className={`p-3 rounded-xl ${color.replace("text-", "text-")} bg-opacity-15`}
+      >
+        <Icon className={`h-6 w-6 ${color}`} />
       </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-          {title}
-        </h4>
-        <p className="text-xs text-gray-500 mt-1 truncate">{description}</p>
+      <div className="flex-1">
+        <h4 className="font-semibold text-sm">{title}</h4>
+        <p className="text-xs text-gray-500">{description}</p>
       </div>
-      <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-blue-500 transition-colors shrink-0" />
+      <ChevronRight className="h-4 w-4 text-gray-400" />
     </Link>
   );
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your store.</p>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-gray-500">Store overview & performance</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200">
-            Export Report
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 rounded-lg transition-colors">
-            + New Order
+
+        <div className="flex gap-3">
+          <button
+            onClick={fetchDashboardData}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${Object.values(loading).some((l) => l) && "animate-spin"}`}
+            />
+            Refresh
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Users"
           value={stats.totalUsers}
           icon={Users}
           color="text-blue-600"
-          trend="+12.5%"
+          trend="+12%"
         />
         <StatCard
           title="Total Revenue"
           value={stats.totalRevenue}
-          icon={DollarSign}
+          icon={Users}
           color="text-emerald-600"
-          trend="+24.3%"
+          trend="+24%"
         />
         <StatCard
           title="Total Orders"
           value={stats.totalPurchases}
           icon={Package}
           color="text-indigo-600"
-          trend="+8.2%"
+          trend="+8%"
         />
         <StatCard
           title="Pending Inquiries"
           value={stats.pendingInquiries}
           icon={Mail}
           color="text-orange-600"
-          trend="+3.1%"
+          trend="+3%"
         />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Recent Orders - Takes 2 columns */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-                <p className="text-sm text-gray-500">Latest transactions</p>
-              </div>
-              <Link
-                href="/admin/purchases"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
-              >
-                View all
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px]">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentPurchases.map((purchase) => (
-                    <tr key={purchase.id} className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{purchase.user}</p>
-                          <p className="text-xs text-gray-500">{purchase.email}</p>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <p className="text-sm text-gray-900">{purchase.item}</p>
-                      </td>
-                      <td className="py-4 px-6">
-                        <p className="text-sm text-gray-600">{purchase.date}</p>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            purchase.status === "Completed"
-                              ? "bg-green-100 text-green-800"
-                              : purchase.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {purchase.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <p className="text-sm font-semibold text-gray-900">${purchase.amount.toLocaleString()}</p>
-                      </td>
-                      <td className="py-4 px-6">
-                        <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                          <Eye className="h-4 w-4 text-gray-500" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {/* Recent Orders */}
+        <div className="lg:col-span-2 bg-white border rounded-xl">
+          <div className="p-4 border-b flex justify-between">
+            <h2 className="font-semibold">Recent Orders</h2>
+            <Link
+              href="/admin/purchases"
+              className="text-blue-600 text-sm flex items-center gap-1"
+            >
+              View all <ChevronRight className="h-4 w-4" />
+            </Link>
           </div>
+
+          <table className="w-full">
+            <thead className="bg-gray-50 text-xs text-gray-500">
+              <tr>
+                <th className="p-3 text-left">Customer</th>
+                <th className="p-3 text-left">Product</th>
+                <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Amount</th>
+                <th className="p-3">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentPurchases.map((p) => (
+                <tr key={p.id} className="border-t hover:bg-gray-50">
+                  <td className="p-3">{p.user?.email}</td>
+                  <td className="p-3">{p.itemName}</td>
+                  <td className="p-3">
+                    <span className="flex items-center gap-1 text-xs">
+                      {p.status === "ACTIVE" && (
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      )}
+                      {p.status === "PENDING" && (
+                        <Clock className="h-4 w-4 text-yellow-600" />
+                      )}
+                      {p.status}
+                    </span>
+                  </td>
+                  <td className="p-3 font-semibold">${p.itemPrice}</td>
+                  <td className="p-3 text-center">
+                    <Link href={`/admin/users/${p.userId}`}>
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        {/* Right Sidebar - Takes 1 column */}
+        {/* Right Sidebar */}
         <div className="space-y-6">
-          {/* Recent Messages */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Recent Messages</h2>
-                  <p className="text-sm text-gray-500">Customer inquiries</p>
-                </div>
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                  3 new
-                </span>
-              </div>
+          {/* Messages */}
+          <div className="bg-white border rounded-xl">
+            <div className="p-4 border-b">
+              <h2 className="font-semibold">Recent Messages</h2>
             </div>
-            <div className="divide-y divide-gray-200">
-              {recentMessages.map((message) => (
-                <Link
-                  key={message.id}
-                  href="/admin/messages"
-                  className={`block p-4 hover:bg-gray-50 transition-colors ${!message.read ? "bg-blue-50" : ""}`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-full ${message.read ? "bg-gray-100" : "bg-blue-100"} shrink-0`}>
-                      <MessageSquare className={`h-4 w-4 ${message.read ? "text-gray-600" : "text-blue-600"}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{message.sender}</p>
-                          <p className="text-sm text-gray-600 truncate mt-1">{message.subject}</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
-                          <span className="text-xs text-gray-500 whitespace-nowrap">{message.time}</span>
-                          {!message.read && (
-                            <span className="px-1.5 py-0.5 bg-blue-600 text-white text-[10px] font-medium rounded">
-                              NEW
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="px-6 py-3 border-t border-gray-200">
+
+            {recentMessages.map((m) => (
               <Link
-                href="/admin/messages"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center justify-center gap-1"
+                key={m.id}
+                href={`/admin/messages/${m.id}`}
+                className="flex items-start gap-3 p-4 border-t hover:bg-gray-50"
               >
-                View all messages
-                <ChevronRight className="h-4 w-4" />
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <MessageSquare className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm">{m.fullName}</p>
+                  <p className="text-xs text-gray-500 truncate">{m.message}</p>
+                </div>
               </Link>
-            </div>
+            ))}
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-              <p className="text-sm text-gray-500">Frequently used actions</p>
+          <div className="bg-white border rounded-xl">
+            <div className="p-4 border-b">
+              <h2 className="font-semibold">Quick Actions</h2>
             </div>
+
             <div className="p-4 space-y-3">
               <QuickAction
                 href="/admin/users"
-                icon={UserPlus}
-                title="Add New User"
-                description="Create a new user account"
+                icon={User}
+                title="Manage Users"
+                description="Create new user"
                 color="text-blue-600"
               />
               <QuickAction
                 href="/admin/purchases"
                 icon={ShoppingBag}
                 title="Process Order"
-                description="Manage customer orders"
+                description="Manage orders"
                 color="text-indigo-600"
               />
-              <QuickAction
-                href="/admin/settings"
-                icon={Settings}
-                title="System Settings"
-                description="Update platform configuration"
-                color="text-emerald-600"
-              />
+       
               <QuickAction
                 href="/admin/payments"
                 icon={CreditCard}
-                title="Payment Settings"
-                description="Configure payment methods"
+                title="Payments"
+                description="Payment setup"
                 color="text-purple-600"
               />
             </div>

@@ -480,9 +480,9 @@ const CareerPackages = () => {
                       {/* <span className="text-gray-600">Flexible Payment:</span> */}
                       <span className="font-semibold">${plan.installment}/month</span>
                     </div>
-                    <div className="text-xs text-gray-500 text-center">
+                    {/* <div className="text-xs text-gray-500 text-center">
                       4 Easy Installments
-                    </div>
+                    </div> */}
                   </div>
 
                   <ul className="space-y-3 mb-6">

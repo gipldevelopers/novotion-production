@@ -35,60 +35,63 @@ const ADDRESS_TYPES = [
 ];
 
 // Optimized Input Component
-const InputField = React.memo(({
-  label,
-  name,
-  value,
-  onChange,
-  onBlur,
-  error,
-  touched,
-  type = "text",
-  placeholder,
-  required = true,
-  className = "",
-  autoFocus = false,
-  ...props
-}) => {
-  const inputRef = useRef(null);
+const InputField = React.memo(
+  ({
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    error,
+    touched,
+    type = "text",
+    placeholder,
+    required = true,
+    className = "",
+    autoFocus = false,
+    ...props
+  }) => {
+    const inputRef = useRef(null);
 
-  // Focus on mount if autoFocus is true
-  useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [autoFocus]);
+    // Focus on mount if autoFocus is true
+    useEffect(() => {
+      if (autoFocus && inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [autoFocus]);
 
-  return (
-    <div className={`space-y-2 ${className}`}>
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      <input
-        ref={inputRef}
-        type={type}
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        className={`w-full h-11 px-4 rounded-lg border ${error && touched
-          ? "border-red-300 bg-red-50 focus:border-red-500"
-          : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
+    return (
+      <div className={`space-y-2 ${className}`}>
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+        <input
+          ref={inputRef}
+          type={type}
+          name={name}
+          value={value || ""}
+          onChange={onChange}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          className={`w-full h-11 px-4 rounded-lg border ${
+            error && touched
+              ? "border-red-300 bg-red-50 focus:border-red-500"
+              : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
           } focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors text-base placeholder-gray-400`}
-        aria-invalid={!!error && touched}
-        aria-describedby={error && touched ? `${name}-error` : undefined}
-        {...props}
-      />
-      {error && touched && (
-        <p id={`${name}-error`} className="text-xs text-red-600">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-});
+          aria-invalid={!!error && touched}
+          aria-describedby={error && touched ? `${name}-error` : undefined}
+          {...props}
+        />
+        {error && touched && (
+          <p id={`${name}-error`} className="text-xs text-red-600">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  },
+);
 
 InputField.displayName = "InputField";
 
@@ -132,7 +135,7 @@ const PaymentPage = () => {
         const data = await res.json();
         if (data.user) {
           setUser(data.user);
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             firstName: data.user.name?.split(" ")[0] || "",
             lastName: data.user.name?.split(" ").slice(1).join(" ") || "",
@@ -150,7 +153,7 @@ const PaymentPage = () => {
         }
       } catch (err) {
         console.error("Failed to fetch user", err);
-        router.push("/auth/login?callbackUrl=/services/payment");
+        router.push("/");
       } finally {
         setAuthChecked(true);
       }
@@ -159,38 +162,48 @@ const PaymentPage = () => {
   }, [router]);
 
   // Individual field change handlers
-  const createInputChangeHandler = useCallback((fieldName) => (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  const createInputChangeHandler = useCallback(
+    (fieldName) => (e) => {
+      const value =
+        e.target.type === "checkbox" ? e.target.checked : e.target.value;
 
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: value
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: value,
+      }));
 
-    if (errors[fieldName]) {
-      setErrors(prev => ({ ...prev, [fieldName]: "" }));
-    }
-  }, [errors]);
+      if (errors[fieldName]) {
+        setErrors((prev) => ({ ...prev, [fieldName]: "" }));
+      }
+    },
+    [errors],
+  );
 
-  const createBlurHandler = useCallback((fieldName) => () => {
-    setTouched(prev => ({ ...prev, [fieldName]: true }));
-  }, []);
+  const createBlurHandler = useCallback(
+    (fieldName) => () => {
+      setTouched((prev) => ({ ...prev, [fieldName]: true }));
+    },
+    [],
+  );
 
-  const handlePhoneChange = useCallback((e) => {
-    const value = e.target.value.replace(/[^\d+]/g, "").slice(0, 15);
-    setFormData(prev => ({ ...prev, phone: value }));
+  const handlePhoneChange = useCallback(
+    (e) => {
+      const value = e.target.value.replace(/[^\d+]/g, "").slice(0, 15);
+      setFormData((prev) => ({ ...prev, phone: value }));
 
-    if (errors.phone) {
-      setErrors(prev => ({ ...prev, phone: "" }));
-    }
-  }, [errors.phone]);
+      if (errors.phone) {
+        setErrors((prev) => ({ ...prev, phone: "" }));
+      }
+    },
+    [errors.phone],
+  );
 
   const handleAddressTypeChange = useCallback((e) => {
-    setFormData(prev => ({ ...prev, addressType: e.target.value }));
+    setFormData((prev) => ({ ...prev, addressType: e.target.value }));
   }, []);
 
   const handleCountryChange = useCallback((e) => {
-    setFormData(prev => ({ ...prev, country: e.target.value }));
+    setFormData((prev) => ({ ...prev, country: e.target.value }));
   }, []);
 
   // Load saved addresses on mount
@@ -262,7 +275,7 @@ const PaymentPage = () => {
 
   const handleDeleteAddress = useCallback((e, addressId) => {
     e.stopPropagation();
-    setSavedAddresses(prev => prev.filter(addr => addr.id !== addressId));
+    setSavedAddresses((prev) => prev.filter((addr) => addr.id !== addressId));
     toast.success("Address deleted");
   }, []);
 
@@ -282,21 +295,29 @@ const PaymentPage = () => {
 
     const addressData = {
       ...formData,
-      label: `${ADDRESS_TYPES.find(t => t.value === formData.addressType)?.label} - ${formData.city}`,
+      label: `${ADDRESS_TYPES.find((t) => t.value === formData.addressType)?.label} - ${formData.city}`,
       timestamp: new Date().toISOString(),
     };
 
-    setSavedAddresses(prev => {
+    setSavedAddresses((prev) => {
       if (editingAddressId) {
         // Update existing
-        return prev.map(addr => addr.id === editingAddressId ? { ...addressData, id: editingAddressId } : addr);
+        return prev.map((addr) =>
+          addr.id === editingAddressId
+            ? { ...addressData, id: editingAddressId }
+            : addr,
+        );
       } else {
         // Add new
         const newAddress = {
           id: Date.now(),
           ...addressData,
         };
-        const filtered = prev.filter(addr => addr.email !== newAddress.email || addr.address !== newAddress.address);
+        const filtered = prev.filter(
+          (addr) =>
+            addr.email !== newAddress.email ||
+            addr.address !== newAddress.address,
+        );
         return [newAddress, ...filtered];
       }
     });
@@ -306,10 +327,19 @@ const PaymentPage = () => {
   }, [formData, editingAddressId]);
 
   const validateForm = useCallback(() => {
-    const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'postalCode'];
+    const required = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "postalCode",
+    ];
     const newErrors = {};
 
-    required.forEach(field => {
+    required.forEach((field) => {
       if (!formData[field]?.trim()) {
         newErrors[field] = "This field is required";
       }
@@ -395,10 +425,20 @@ const PaymentPage = () => {
             <ShieldCheck className="h-10 w-10 text-blue-600" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Redirecting to Secure Payment</h2>
-        <p className="text-gray-500 max-w-sm">Please do not refresh the page or click back. We are preparing your secure checkout session.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Redirecting to Secure Payment
+        </h2>
+        <p className="text-gray-500 max-w-sm">
+          Please do not refresh the page or click back. We are preparing your
+          secure checkout session.
+        </p>
         <div className="mt-8 flex items-center gap-2 grayscale opacity-50">
-          <Image src="/logo/novotion_01.svg" alt="Novotion" width={30} height={30} />
+          <Image
+            src="/logo/novotion_01.svg"
+            alt="Novotion"
+            width={30}
+            height={30}
+          />
           <span className="font-bold text-gray-400">×</span>
           <span className="font-bold text-gray-400">PAYGLOCAL</span>
         </div>
@@ -421,9 +461,12 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            <h2 className="text-3xl font-black text-gray-900 mb-4">Your bag is empty</h2>
+            <h2 className="text-3xl font-black text-gray-900 mb-4">
+              Your bag is empty
+            </h2>
             <p className="text-gray-500 mb-10 leading-relaxed max-w-sm mx-auto">
-              Looks like you haven't added any premium services to your cart yet. Explore our career-boosting packages today.
+              Looks like you haven't added any premium services to your cart
+              yet. Explore our career-boosting packages today.
             </p>
 
             <div className="flex flex-col gap-4">
@@ -434,7 +477,10 @@ const PaymentPage = () => {
                 </Button>
               </Link>
               <Link href="/">
-                <Button variant="outline" className="w-full h-14 rounded-2xl font-bold text-gray-700 border-gray-200 hover:bg-gray-50">
+                <Button
+                  variant="outline"
+                  className="w-full h-14 rounded-2xl font-bold text-gray-700 border-gray-200 hover:bg-gray-50"
+                >
                   <Home className="h-5 w-5 mr-2" />
                   Back to Home
                 </Button>
@@ -444,15 +490,21 @@ const PaymentPage = () => {
             <div className="mt-16 pt-8 border-t border-gray-50 flex items-center justify-center gap-8 grayscale opacity-40">
               <div className="flex flex-col items-center">
                 <ShieldCheck className="h-6 w-6 mb-1" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Secure</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  Secure
+                </span>
               </div>
               <div className="flex flex-col items-center">
                 <Lock className="h-6 w-6 mb-1" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Encrypted</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  Encrypted
+                </span>
               </div>
               <div className="flex flex-col items-center">
                 <CheckCircle2 className="h-6 w-6 mb-1" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Verified</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  Verified
+                </span>
               </div>
             </div>
           </div>
@@ -480,12 +532,21 @@ const PaymentPage = () => {
           {/* Progress */}
           <div className="mb-10">
             <div className="flex items-center justify-center gap-2">
-              <div className={`h-2 flex-1 rounded-full ${step >= 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
-                }`}>
+              <div
+                className={`h-2 flex-1 rounded-full ${step >= 1 ? "bg-blue-600" : "bg-gray-200"}`}
+              ></div>
+              <div
+                className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  step >= 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-400"
+                }`}
+              >
                 1
               </div>
-              <div className={`h-2 flex-1 rounded-full ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+              <div
+                className={`h-2 flex-1 rounded-full ${step >= 2 ? "bg-blue-600" : "bg-gray-200"}`}
+              ></div>
             </div>
           </div>
 
@@ -522,50 +583,68 @@ const PaymentPage = () => {
                       </div>
 
                       <div className="space-y-2">
-                        {savedAddresses.slice(0, showSavedAddresses ? undefined : 3).map((address) => (
-                          <div
-                            key={address.id || address.email}
-                            className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-blue-500 group ${formData.address === address.address ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        {savedAddresses
+                          .slice(0, showSavedAddresses ? undefined : 3)
+                          .map((address) => (
+                            <div
+                              key={address.id || address.email}
+                              className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-blue-500 group ${
+                                formData.address === address.address
+                                  ? "border-blue-500 bg-blue-50"
+                                  : "border-gray-200"
                               }`}
-                            onClick={() => handleSelectAddress(address)}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className={`mt-1 h-5 w-5 rounded-full border flex items-center justify-center ${formData.address === address.address
-                                ? 'border-blue-500 bg-blue-500'
-                                : 'border-gray-300'
-                                }`}>
-                                {formData.address === address.address && (
-                                  <div className="h-2 w-2 rounded-full bg-white"></div>
-                                )}
-                              </div>
-                              <div className="flex-1 text-sm">
-                                <div className="flex items-center justify-between">
-                                  <p className="font-bold text-gray-900">{address.firstName} {address.lastName}</p>
-                                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                      type="button"
-                                      onClick={(e) => handleEditAddress(e, address)}
-                                      className="p-1 text-gray-400 hover:text-blue-600 rounded"
-                                      title="Edit Address"
-                                    >
-                                      <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => handleDeleteAddress(e, address.id)}
-                                      className="p-1 text-gray-400 hover:text-red-600 rounded"
-                                      title="Delete Address"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                  </div>
+                              onClick={() => handleSelectAddress(address)}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className={`mt-1 h-5 w-5 rounded-full border flex items-center justify-center ${
+                                    formData.address === address.address
+                                      ? "border-blue-500 bg-blue-500"
+                                      : "border-gray-300"
+                                  }`}
+                                >
+                                  {formData.address === address.address && (
+                                    <div className="h-2 w-2 rounded-full bg-white"></div>
+                                  )}
                                 </div>
-                                <p className="text-gray-600">{address.address}, {address.city}</p>
-                                <p className="text-gray-500">{address.email} • {address.phone}</p>
+                                <div className="flex-1 text-sm">
+                                  <div className="flex items-center justify-between">
+                                    <p className="font-bold text-gray-900">
+                                      {address.firstName} {address.lastName}
+                                    </p>
+                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <button
+                                        type="button"
+                                        onClick={(e) =>
+                                          handleEditAddress(e, address)
+                                        }
+                                        className="p-1 text-gray-400 hover:text-blue-600 rounded"
+                                        title="Edit Address"
+                                      >
+                                        <Edit2 className="h-4 w-4" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={(e) =>
+                                          handleDeleteAddress(e, address.id)
+                                        }
+                                        className="p-1 text-gray-400 hover:text-red-600 rounded"
+                                        title="Delete Address"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <p className="text-gray-600">
+                                    {address.address}, {address.city}
+                                  </p>
+                                  <p className="text-gray-500">
+                                    {address.email} • {address.phone}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
                   )}
@@ -594,8 +673,8 @@ const PaymentPage = () => {
                         label="First Name"
                         name="firstName"
                         value={formData.firstName}
-                        onChange={createInputChangeHandler('firstName')}
-                        onBlur={createBlurHandler('firstName')}
+                        onChange={createInputChangeHandler("firstName")}
+                        onBlur={createBlurHandler("firstName")}
                         placeholder="e.g. Michael"
                         error={errors.firstName}
                         touched={touched.firstName}
@@ -604,8 +683,8 @@ const PaymentPage = () => {
                         label="Last Name"
                         name="lastName"
                         value={formData.lastName}
-                        onChange={createInputChangeHandler('lastName')}
-                        onBlur={createBlurHandler('lastName')}
+                        onChange={createInputChangeHandler("lastName")}
+                        onBlur={createBlurHandler("lastName")}
                         placeholder="e.g. Scott"
                         error={errors.lastName}
                         touched={touched.lastName}
@@ -616,8 +695,8 @@ const PaymentPage = () => {
                           name="email"
                           type="email"
                           value={formData.email}
-                          onChange={createInputChangeHandler('email')}
-                          onBlur={createBlurHandler('email')}
+                          onChange={createInputChangeHandler("email")}
+                          onBlur={createBlurHandler("email")}
                           placeholder="e.g. michael.scott@dundermifflin.com"
                           error={errors.email}
                           touched={touched.email}
@@ -629,13 +708,15 @@ const PaymentPage = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={handlePhoneChange}
-                        onBlur={createBlurHandler('phone')}
+                        onBlur={createBlurHandler("phone")}
                         placeholder="e.g. +1 123 456 7890"
                         error={errors.phone}
                         touched={touched.phone}
                       />
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Country</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Country
+                        </label>
                         <select
                           name="country"
                           value={formData.country}
@@ -656,8 +737,8 @@ const PaymentPage = () => {
                           label="Street Address"
                           name="address"
                           value={formData.address}
-                          onChange={createInputChangeHandler('address')}
-                          onBlur={createBlurHandler('address')}
+                          onChange={createInputChangeHandler("address")}
+                          onBlur={createBlurHandler("address")}
                           placeholder="e.g. 1725 Slough Avenue, Suite 200"
                           error={errors.address}
                           touched={touched.address}
@@ -667,8 +748,8 @@ const PaymentPage = () => {
                         label="City"
                         name="city"
                         value={formData.city}
-                        onChange={createInputChangeHandler('city')}
-                        onBlur={createBlurHandler('city')}
+                        onChange={createInputChangeHandler("city")}
+                        onBlur={createBlurHandler("city")}
                         placeholder="e.g. Scranton"
                         error={errors.city}
                         touched={touched.city}
@@ -677,8 +758,8 @@ const PaymentPage = () => {
                         label="State / Province"
                         name="state"
                         value={formData.state}
-                        onChange={createInputChangeHandler('state')}
-                        onBlur={createBlurHandler('state')}
+                        onChange={createInputChangeHandler("state")}
+                        onBlur={createBlurHandler("state")}
                         placeholder="e.g. Pennsylvania"
                         error={errors.state}
                         touched={touched.state}
@@ -687,14 +768,16 @@ const PaymentPage = () => {
                         label="Postal / Zip Code"
                         name="postalCode"
                         value={formData.postalCode}
-                        onChange={createInputChangeHandler('postalCode')}
-                        onBlur={createBlurHandler('postalCode')}
+                        onChange={createInputChangeHandler("postalCode")}
+                        onBlur={createBlurHandler("postalCode")}
                         placeholder="e.g. 18505"
                         error={errors.postalCode}
                         touched={touched.postalCode}
                       />
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Address Type</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Address Type
+                        </label>
                         <select
                           name="addressType"
                           value={formData.addressType}
@@ -702,7 +785,9 @@ const PaymentPage = () => {
                           className="w-full h-11 px-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors"
                         >
                           {ADDRESS_TYPES.map((type) => (
-                            <option key={type.value} value={type.value}>{type.label}</option>
+                            <option key={type.value} value={type.value}>
+                              {type.label}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -715,10 +800,13 @@ const PaymentPage = () => {
                       id="saveAddress"
                       name="saveAddress"
                       checked={formData.saveAddress}
-                      onChange={createInputChangeHandler('saveAddress')}
+                      onChange={createInputChangeHandler("saveAddress")}
                       className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <label htmlFor="saveAddress" className="text-sm text-gray-700">
+                    <label
+                      htmlFor="saveAddress"
+                      className="text-sm text-gray-700"
+                    >
                       Save this information for later
                     </label>
                   </div>
@@ -745,12 +833,21 @@ const PaymentPage = () => {
 
                 <div className="space-y-4 mb-6">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex items-start justify-between gap-3">
+                    <div
+                      key={item.id}
+                      className="flex items-start justify-between gap-3"
+                    >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.description}</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                          {item.description}
+                        </p>
                       </div>
-                      <span className="text-sm font-semibold text-gray-900">${item.price}</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        ${item.price}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -762,7 +859,9 @@ const PaymentPage = () => {
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                     <span className="text-lg font-bold">Total</span>
-                    <span className="text-2xl font-bold text-blue-600">${total}</span>
+                    <span className="text-2xl font-bold text-blue-600">
+                      ${total}
+                    </span>
                   </div>
                 </div>
 
@@ -770,8 +869,13 @@ const PaymentPage = () => {
                   <div className="flex items-start gap-3">
                     <Lock className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div>
-                      <p className="text-sm font-bold text-blue-900">Secure Checkout</p>
-                      <p className="text-xs text-blue-800 leading-relaxed">Powered by PayGlocal. Your data is encrypted and never stored on our servers.</p>
+                      <p className="text-sm font-bold text-blue-900">
+                        Secure Checkout
+                      </p>
+                      <p className="text-xs text-blue-800 leading-relaxed">
+                        Powered by PayGlocal. Your data is encrypted and never
+                        stored on our servers.
+                      </p>
                     </div>
                   </div>
                 </div>

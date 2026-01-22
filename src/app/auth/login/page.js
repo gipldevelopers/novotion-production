@@ -4,7 +4,16 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Lock, Loader2, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Loader2,
+  ArrowRight,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -43,8 +52,8 @@ function LoginForm() {
       toast.success("Welcome back!");
 
       // Check for admin role and redirect accordingly
-      if (data.user?.role === 'ADMIN') {
-        router.push('/admin');
+      if (data.user?.role === "ADMIN") {
+        router.push("/admin");
       } else {
         router.push(callbackUrl);
       }
@@ -67,7 +76,8 @@ function LoginForm() {
               Empowering Your Professional Journey.
             </h2>
             <p className="text-blue-100 text-lg">
-              Log in to access your personalized career packages, track your services, and accelerate your growth.
+              Log in to access your personalized career packages, track your
+              services, and accelerate your growth.
             </p>
           </div>
         </div>
@@ -76,7 +86,9 @@ function LoginForm() {
           <ShieldCheck className="h-10 w-10 text-blue-300" />
           <div>
             <p className="font-bold">Secure Access</p>
-            <p className="text-sm text-blue-100">Your data is fully encrypted.</p>
+            <p className="text-sm text-blue-100">
+              Your data is fully encrypted.
+            </p>
           </div>
         </div>
 
@@ -89,7 +101,10 @@ function LoginForm() {
       <div className="flex flex-col items-center justify-center p-8 lg:p-12 relative bg-slate-50/30">
         <div className="w-full max-w-sm space-y-8 bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
           <div className="flex justify-center mb-6">
-            <Link href="/" className="transition-transform hover:scale-105 duration-300">
+            <Link
+              href="/"
+              className="transition-transform hover:scale-105 duration-300"
+            >
               <Image
                 src="/logo/novotion_01.svg"
                 alt="Novotion"
@@ -102,8 +117,12 @@ function LoginForm() {
           </div>
 
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome Back</h1>
-            <p className="text-slate-500 mt-2 text-sm italic">Enter your credentials to access your account</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Welcome Back
+            </h1>
+            <p className="text-slate-500 mt-2 text-sm italic">
+              Enter your credentials to access your account
+            </p>
           </div>
 
           {formError && (
@@ -133,7 +152,10 @@ function LoginForm() {
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                   <Lock className="h-3.5 w-3.5" /> Password
                 </label>
-                <Link href="#" className="text-[10px] text-blue-600 font-bold hover:underline uppercase tracking-widest">
+                <Link
+                  href="#"
+                  className="text-[10px] text-blue-600 font-bold hover:underline uppercase tracking-widest"
+                >
                   Forgot?
                 </Link>
               </div>
@@ -151,7 +173,11 @@ function LoginForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -175,12 +201,24 @@ function LoginForm() {
           </form>
 
           <div className="relative py-2">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-            <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest"><span className="bg-white px-3 text-slate-400">Join the Circle</span></div>
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-100"></div>
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest">
+              <span className="bg-white px-3 text-slate-400">
+                Join the Circle
+              </span>
+            </div>
           </div>
 
-          <Link href={`/auth/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="block">
-            <Button variant="outline" className="w-full h-11 rounded-xl text-slate-700 font-bold border-slate-200 hover:bg-slate-50 transition-colors uppercase tracking-widest text-[10px]">
+          <Link
+            href={`/auth/register?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+            className="block"
+          >
+            <Button
+              variant="outline"
+              className="w-full h-11 rounded-xl text-slate-700 font-bold border-slate-200 hover:bg-slate-50 transition-colors uppercase tracking-widest text-[10px]"
+            >
               Create New Account
             </Button>
           </Link>
@@ -192,17 +230,27 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="relative flex flex-col items-center gap-4">
-          <div className="relative w-16 h-16">
-            <Image src="/favicon.ico" alt="Novotion" width={64} height={64} className="animate-pulse" />
-            <div className="absolute -inset-4 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="relative flex flex-col items-center gap-4">
+            <div className="relative w-16 h-16">
+              <Image
+                src="/favicon.ico"
+                alt="Novotion"
+                width={64}
+                height={64}
+                className="animate-pulse"
+              />
+              <div className="absolute -inset-4 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+            <div className="text-blue-600 font-bold tracking-widest text-xs uppercase animate-pulse">
+              Loading Novotion
+            </div>
           </div>
-          <div className="text-blue-600 font-bold tracking-widest text-xs uppercase animate-pulse">Loading Novotion</div>
         </div>
-      </div>
-    }>
+      }
+    >
       <LoginForm />
     </Suspense>
   );
