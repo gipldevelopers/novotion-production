@@ -547,7 +547,7 @@
 // src\app\blog\[slug]\page.js
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -582,186 +582,6 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-// Complete blog posts data matching the slugs from blog page
-const blogPosts = {
-  'future-of-rpo-emerging-technologies-workforce-dynamics': {
-    id: 1,
-    title: 'The Future of RPO: Emerging Technologies & Workforce Dynamics',
-    excerpt: 'Discover how emerging technologies like AI and automation are revolutionizing recruitment process outsourcing and talent acquisition strategies.',
-    content: `
-      <h2>Introduction: The Evolving Landscape of Recruitment</h2>
-      <p>The recruitment industry is undergoing a significant transformation, driven by technological advancements and changing workforce dynamics. As organizations strive to attract and retain top talent, Recruitment Process Outsourcing (RPO) has emerged as a strategic solution.</p>
-
-      <h2>The Rise of AI in Talent Acquisition</h2>
-      <p>Artificial Intelligence is no longer a buzzword but a practical tool reshaping how we approach recruitment. From automated resume screening to AI-powered candidate matching, the technology is making recruitment more efficient and data-driven.</p>
-
-      <h3>Key AI Applications in RPO:</h3>
-      <ul>
-        <li><strong>Intelligent Candidate Sourcing:</strong> AI algorithms can scan multiple platforms to identify potential candidates based on specific criteria</li>
-        <li><strong>Automated Screening:</strong> Natural Language Processing (NLP) helps in quickly assessing candidate qualifications and experience</li>
-        <li><strong>Predictive Analytics:</strong> Machine learning models can predict candidate success and cultural fit</li>
-        <li><strong>Chatbot Integration:</strong> 24/7 candidate engagement and initial screening</li>
-      </ul>
-
-      <h2>Automation and Its Impact on Recruitment Efficiency</h2>
-      <p>Automation technologies are streamlining repetitive tasks, allowing recruitment professionals to focus on strategic activities. This includes automated interview scheduling, candidate communication, and onboarding processes.</p>
-
-      <blockquote>
-        "The future of RPO lies in the perfect blend of technology and human expertise. While AI handles efficiency, human recruiters bring empathy and strategic thinking to the table."
-      </blockquote>
-
-      <h2>Changing Workforce Dynamics</h2>
-      <p>The post-pandemic era has brought significant changes in workforce expectations:</p>
-      <ul>
-        <li>Increased demand for remote and hybrid work options</li>
-        <li>Greater emphasis on work-life balance</li>
-        <li>Focus on diversity, equity, and inclusion</li>
-        <li>Rise of the gig economy and contract work</li>
-      </ul>
-
-      <h2>Data-Driven Decision Making</h2>
-      <p>Modern RPO providers leverage data analytics to provide insights into:</p>
-      <ul>
-        <li>Time-to-hire metrics and optimization</li>
-        <li>Quality of hire and retention rates</li>
-        <li>Candidate experience feedback</li>
-        <li>Market salary trends and benchmarks</li>
-      </ul>
-
-      <h2>The Human Touch in Digital Recruitment</h2>
-      <p>Despite technological advancements, the human element remains crucial. Successful RPO partnerships combine technology with:</p>
-      <ul>
-        <li>Strategic consulting and advisory services</li>
-        <li>Employer branding expertise</li>
-        <li>Candidate relationship management</li>
-        <li>Cultural assessment and fit analysis</li>
-      </ul>
-
-      <h2>Future Trends to Watch</h2>
-      <p>As we look ahead, several trends are shaping the future of RPO:</p>
-      <ol>
-        <li><strong>Hyper-personalization:</strong> Tailored candidate experiences based on individual preferences</li>
-        <li><strong>Skills-based hiring:</strong> Focusing on capabilities rather than traditional qualifications</li>
-        <li><strong>Global talent pools:</strong> Leveraging remote work to access worldwide talent</li>
-        <li><strong>Continuous recruitment:</strong> Building talent pipelines for future needs</li>
-      </ol>
-
-      <h2>Conclusion: Embracing the Change</h2>
-      <p>The future of RPO is bright and dynamic. Organizations that embrace these technological advancements while maintaining the human touch will be best positioned to succeed in the competitive talent landscape. The key is to view technology as an enabler rather than a replacement for human expertise.</p>
-
-      <p>At Novotion, we're committed to staying at the forefront of these changes, ensuring our clients benefit from the latest innovations while receiving the personalized service that sets us apart.</p>
-    `,
-    date: 'March 15, 2025',
-    readTime: '5 min read',
-    category: 'For Organizations',
-    subCategory: 'RPO Best Practices',
-    views: '1.2K',
-    likes: 89,
-    comments: 12,
-    featured: true,
-    author: {
-      name: 'Sarah Chen',
-      role: 'Head of RPO Strategy',
-      bio: 'Sarah has over 15 years of experience in talent acquisition and RPO strategy. She specializes in helping organizations optimize their recruitment processes through technology and data-driven approaches.'
-    },
-    tags: ['RPO', 'AI', 'Automation', 'Talent Acquisition', 'Future of Work']
-  },
-  'stand-out-us-it-market-essential-tips-contract-professionals': {
-    id: 2,
-    title: 'Stand Out in the U.S. IT Market: Essential Tips for Contract Professionals',
-    excerpt: 'Essential tips and career strategies for IT professionals looking to differentiate themselves and land high-value contracts through effective career support in the competitive U.S. IT market.',
-    content: `
-      <h2>Navigating the Competitive U.S. IT Contract Market</h2>
-      <p>The U.S. IT contract market offers tremendous opportunities for skilled professionals, but standing out requires strategic planning and execution. Here's how you can position yourself for success.</p>
-
-      <h2>Building a Strong Professional Brand</h2>
-      <p>Your personal brand is your most valuable asset in the contract market. It's what sets you apart from thousands of other IT professionals.</p>
-
-      <h3>Key Elements of a Strong IT Professional Brand:</h3>
-      <ul>
-        <li><strong>Specialized Expertise:</strong> Develop deep knowledge in specific technologies or domains</li>
-        <li><strong>Online Presence:</strong> Optimize your LinkedIn profile and professional networks</li>
-        <li><strong>Portfolio Development:</strong> Showcase your projects and achievements</li>
-        <li><strong>Thought Leadership:</strong> Share insights and contribute to technical discussions</li>
-      </ul>
-
-      <h2>Mastering the Art of Resume Optimization</h2>
-      <p>Your resume is often the first impression you make. Make it count with these strategies:</p>
-
-      <blockquote>
-        "A well-crafted resume doesn't just list your experience—it tells a story of your professional journey and the value you bring to organizations."
-      </blockquote>
-
-      <h2>Effective Interview Preparation</h2>
-      <p>Technical skills alone aren't enough. Successful contract professionals excel in interviews by:</p>
-      <ul>
-        <li>Demonstrating problem-solving abilities</li>
-        <li>Showcasing communication skills</li>
-        <li>Providing specific examples of past successes</li>
-        <li>Asking insightful questions about the project and team</li>
-      </ul>
-
-      <h2>Networking Strategies That Work</h2>
-      <p>Building meaningful professional relationships is crucial for long-term success in the contract market.</p>
-
-      <h2>Contract Negotiation Best Practices</h2>
-      <p>Learn to negotiate contracts that reflect your true value while maintaining positive client relationships.</p>
-
-      <h2>Continuous Skill Development</h2>
-      <p>The IT landscape evolves rapidly. Stay ahead by continuously updating your skills and knowledge.</p>
-
-      <h2>Conclusion: Your Path to Contract Success</h2>
-      <p>Standing out in the U.S. IT contract market requires a combination of technical excellence, strategic positioning, and continuous improvement. By implementing these strategies, you can build a rewarding and sustainable contract career.</p>
-    `,
-    date: 'March 10, 2025',
-    readTime: '7 min read',
-    category: 'For Professionals',
-    subCategory: 'U.S. IT Market Trends',
-    views: '2.4K',
-    likes: 156,
-    comments: 23,
-    featured: true,
-    author: {
-      name: 'Mike Rodriguez',
-      role: 'Career Advisor',
-      bio: 'Mike specializes in helping IT professionals navigate the U.S. contract market. With over a decade of experience, he has guided hundreds of professionals to successful contract placements.'
-    },
-    tags: ['IT Contracts', 'Career Development', 'US Market', 'Contract Negotiation']
-  },
-  'power-global-talent-sourcing-local-expertise-global-reach': {
-    id: 3,
-    title: 'The Power of Global Talent Sourcing: Local Expertise Meets Global Reach',
-    excerpt: 'Learn about the strategic advantages of combining local recruitment expertise with global talent acquisition capabilities for faster, better hiring through RPO services.',
-    content: `
-      <h2>Introduction: The Global Talent Landscape</h2>
-      <p>In today's interconnected world, the ability to source talent globally while maintaining local expertise has become a competitive advantage for organizations of all sizes.</p>
-
-      <h2>The Hybrid Approach: Global Reach, Local Touch</h2>
-      <p>Successful talent acquisition strategies now combine the breadth of global sourcing with the depth of local market understanding.</p>
-
-      <h2>Benefits of Global Talent Sourcing</h2>
-      <p>Access to diverse skill sets, cost optimization, and round-the-clock productivity are just some of the advantages.</p>
-
-      <h2>Conclusion: Building Your Global Talent Strategy</h2>
-      <p>Embrace the power of global talent sourcing to build stronger, more diverse teams that drive business success.</p>
-    `,
-    date: 'March 5, 2025',
-    readTime: '6 min read',
-    category: 'For Organizations',
-    subCategory: 'Talent Acquisition Strategy',
-    views: '1.8K',
-    likes: 67,
-    comments: 8,
-    featured: true,
-    author: {
-      name: 'Emily Watson',
-      role: 'Global Talent Director',
-      bio: 'Emily leads global talent acquisition strategies for multinational organizations, specializing in cross-border recruitment and cultural integration.'
-    },
-    tags: ['Global Talent', 'Local Expertise', 'Talent Sourcing', 'RPO']
-  }
-  // Add other posts with their respective slugs...
-};
 
 // Card components
 const Card = ({ children, className = "", ...props }) => (
@@ -782,35 +602,61 @@ const CardContent = ({ children, className = "", ...props }) => (
 export default function BlogPost() {
   const params = useParams();
   const slug = params.slug;
-  const post = blogPosts[slug];
-  
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [copySuccess, setCopySuccess] = useState('');
+  const [relatedPosts, setRelatedPosts] = useState([]);
 
-  if (!post) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="container mx-auto px-4 py-32 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Post Not Found</h1>
-          <p className="text-gray-600 mb-8">The blog post you're looking for doesn't exist.</p>
-          <Link href="/blog">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Blog
-            </Button>
-          </Link>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/blogs/${slug}`);
+        const data = await res.json();
+        
+        if (res.ok && data.blog) {
+          setPost(data.blog);
+        }
+      } catch (error) {
+        console.error('Error fetching blog:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchBlog();
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    const fetchRelatedPosts = async () => {
+      if (post) {
+        try {
+          const res = await fetch(`/api/blogs?category=${post.category}`);
+          const data = await res.json();
+          
+          if (data.blogs) {
+            const related = data.blogs
+              .filter(p => p.slug !== post.slug)
+              .slice(0, 3);
+            setRelatedPosts(related);
+          }
+        } catch (error) {
+          console.error('Error fetching related posts:', error);
+        }
+      }
+    };
+
+    fetchRelatedPosts();
+  }, [post]);
 
   const handleShare = async (platform = 'copy') => {
     const url = window.location.href;
-    const title = post.title;
+    const title = post?.title || '';
 
     switch (platform) {
       case 'linkedin':
@@ -831,9 +677,35 @@ export default function BlogPost() {
     setShowShareTooltip(false);
   };
 
-  const relatedPosts = Object.values(blogPosts)
-    .filter(p => p.id !== post.id && p.category === post.category)
-    .slice(0, 3);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading blog post...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-32 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Post Not Found</h1>
+          <p className="text-gray-600 mb-8">The blog post you're looking for doesn't exist.</p>
+          <Link href="/blog">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Blog
+            </Button>
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -859,9 +731,6 @@ export default function BlogPost() {
               <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
                 {post.category}
               </span>
-              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-semibold">
-                {post.subCategory}
-              </span>
             </div>
 
             {/* Title */}
@@ -879,8 +748,8 @@ export default function BlogPost() {
               
               {/* Author Info */}
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  {post.author.name?.[0]?.toUpperCase() || 'A'}
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">{post.author.name}</div>
@@ -985,12 +854,20 @@ export default function BlogPost() {
           <div className="max-w-4xl mx-auto">
             
             {/* Featured Image */}
-            <div className="relative h-64 sm:h-80 bg-blue-600 rounded-xl mb-8 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800"></div>
-              <div className="absolute bottom-6 left-6 text-white">
-                <div className="text-sm font-semibold">Featured Image</div>
+            {post.imageUrl ? (
+              <div className="relative h-64 sm:h-80 rounded-xl mb-8 overflow-hidden">
+                <img 
+                  src={post.imageUrl} 
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               </div>
-            </div>
+            ) : (
+              <div className="relative h-64 sm:h-80 bg-blue-600 rounded-xl mb-8 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800"></div>
+              </div>
+            )}
 
             {/* Article Body */}
             <article 
@@ -1020,8 +897,8 @@ export default function BlogPost() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="h-8 w-8 text-blue-600" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-semibold text-xl">
+                    {post.author.name?.[0]?.toUpperCase() || 'A'}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">About the Author</h3>
@@ -1030,9 +907,11 @@ export default function BlogPost() {
                       <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
                       <div className="text-blue-600 text-sm">{post.author.role}</div>
                     </div>
-                    <p className="text-gray-600 leading-relaxed">
-                      {post.author.bio}
-                    </p>
+                    {post.author.bio && (
+                      <p className="text-gray-600 leading-relaxed">
+                        {post.author.bio}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>

@@ -33,25 +33,35 @@ const TopicSuggestionForm = ({ isOpen, onClose }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Topic suggestion submitted:', formData);
-      setIsSubmitted(true);
-      
-      // Reset form after successful submission
-      setTimeout(() => {
-        setIsSubmitted(false);
-        onClose();
-        setFormData({
-          name: '',
-          email: '',
-          topic: '',
-          message: ''
-        });
-      }, 3000);
+      const res = await fetch('/api/topic-suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsSubmitted(true);
+        
+        // Reset form after successful submission
+        setTimeout(() => {
+          setIsSubmitted(false);
+          onClose();
+          setFormData({
+            name: '',
+            email: '',
+            topic: '',
+            message: ''
+          });
+        }, 3000);
+      } else {
+        alert(data.error || 'Failed to submit suggestion. Please try again.');
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
+      alert('Failed to submit suggestion. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
