@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
     Sparkles,
@@ -17,8 +17,40 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/lib/CartContext';
 import { toast } from 'sonner';
 
+// Icon mapping function
+const getIconComponent = (iconName) => {
+    const iconMap = {
+        Zap,
+        Star,
+        Sparkles,
+        Shield,
+        Globe,
+        Users,
+    };
+    return iconMap[iconName] || Zap; // Default to Zap if icon not found
+};
+
 const CustomPackagesSection = () => {
     const { addToCart } = useCart();
+    const [customPackages, setCustomPackages] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPackages = async () => {
+            try {
+                const res = await fetch('/api/custom-packages');
+                const data = await res.json();
+                setCustomPackages(data);
+            } catch (error) {
+                console.error('Error fetching custom packages:', error);
+                toast.error('Failed to load custom packages');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPackages();
+    }, []);
 
     const handleAddToCart = (pkg) => {
         const serviceWithId = {
@@ -38,41 +70,21 @@ const CustomPackagesSection = () => {
         });
     };
 
-    const customPackages = [
-        {
-            id: 'custom-starter',
-            name: 'Custom Starter Package',
-            price: 500,
-            description: 'A tailored entry-level solution for professionals looking for immediate career impact and focused guidance.',
-            icon: Zap,
-            features: [
-                'Personalized Career Strategy Development',
-                'Direct Access to Senior Mentors (2 sessions)',
-                'Customized Interview Preparation',
-                'Priority Support via Email',
-                'Curated Job Referrals'
-            ],
-            color: 'blue',
-            badge: 'Starter'
-        },
-        {
-            id: 'custom-elite',
-            name: 'Custom Elite Package',
-            price: 1000,
-            description: 'Our most comprehensive high-end support package designed for rapid career acceleration and executive positioning.',
-            icon: Star,
-            features: [
-                'Standard Starter Package features',
-                '1-on-1 Executive Coaching Sessions (5 sessions)',
-                'Unlimited Resume & Profile Refinements',
-                '24/7 Priority WhatsApp Support',
-                'Direct Introductions to Key Hiring Managers',
-                'Salary Negotiation Support for Job Offers'
-            ],
-            badge: 'Popular',
-            color: 'indigo'
-        }
-    ];
+    if (loading) {
+        return (
+            <section className="py-24 bg-white relative overflow-hidden">
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (customPackages.length === 0) {
+        return null;
+    }
 
     return (
         <section className="py-24 bg-white relative overflow-hidden">
@@ -150,7 +162,7 @@ const CustomPackagesSection = () => {
                                 <div className="flex flex-col gap-4 mt-auto pt-8 border-t border-slate-100">
                                     <Button
                                         onClick={() => handleAddToCart(pkg)}
-                                        className={`w-full h-14 ${pkg.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-200' : 'bg-slate-900 hover:bg-black shadow-slate-200'} text-white font-black rounded-2xl shadow-xl transition-all duration-300 gap-3 text-lg group/btn`}
+                                        className={`w-full h-14 ${pkg.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-200' : pkg.color === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200' : 'bg-slate-900 hover:bg-black shadow-slate-200'} text-white font-black rounded-2xl shadow-xl transition-all duration-300 gap-3 text-lg group/btn`}
                                     >
                                         <ShoppingCart className="h-5 w-5 group-hover/btn:scale-110 transition-transform" />
                                         Add to Cart

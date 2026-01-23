@@ -1,7 +1,16 @@
 {
   "name": "novotion-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "Novotion Fullstack website with admin dashboard and Userside website",
+  "author": {
+    "email": "developer@gohilinfotech.com",
+    "name": "Gohil Infotech Private Limited",
+    "url": "https://gohilinfotech.com/"
+    
+  },
+ 
+
   "scripts": {
     "dev": "next dev",
     "build": "next build",

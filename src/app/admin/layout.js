@@ -13,6 +13,9 @@ import {
   MessageSquare,
   ShieldCheck,
   Search,
+  FileText,
+  Lightbulb,
+  Package,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -57,6 +60,9 @@ const AdminLayout = ({ children }) => {
     { href: "/admin/purchases", label: "Purchases", icon: ShoppingBag },
     { href: "/admin/payments", label: "Payments", icon: CreditCard },
     { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+    { href: "/admin/blogs", label: "Blogs", icon: FileText },
+    { href: "/admin/packages", label: "Packages", icon: Package },
+    // { href: "/admin/topic-suggestions", label: "Topic Suggestions", icon: Lightbulb },
   ];
 
   return (

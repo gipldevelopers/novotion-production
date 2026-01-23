@@ -75,15 +75,23 @@ const Blog = () => {
   const [visiblePosts, setVisiblePosts] = useState(6);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isTopicFormOpen, setIsTopicFormOpen] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   const observerRef = useRef(null);
   const allArticlesRef = useRef(null);
 
+  // Calculate category counts from posts
+  const categoryCounts = posts.reduce((acc, post) => {
+    acc[post.category] = (acc[post.category] || 0) + 1;
+    return acc;
+  }, {});
+
   const categories = [
-    { name: 'All', icon: Globe, count: 32 },
-    { name: 'For Organizations', icon: Building, count: 15 },
-    { name: 'For Professionals', icon: User, count: 12 },
-    { name: 'Industry Insights', icon: TrendingUpIcon, count: 5 }
+    { name: 'All', icon: Globe, count: posts.length },
+    { name: 'For Organizations', icon: Building, count: categoryCounts['For Organizations'] || 0 },
+    { name: 'For Professionals', icon: User, count: categoryCounts['For Professionals'] || 0 },
+    { name: 'Industry Insights', icon: TrendingUpIcon, count: categoryCounts['Industry Insights'] || 0 }
   ];
 
   const subCategories = {
@@ -109,147 +117,34 @@ const Blog = () => {
     ]
   };
 
-  const posts = [
-    {
-      id: 1,
-      title: 'The Future of RPO: Emerging Technologies & Workforce Dynamics',
-      slug: 'future-of-rpo-emerging-technologies-workforce-dynamics',
-      excerpt: 'Discover how emerging technologies like AI and automation are revolutionizing recruitment process outsourcing and talent acquisition strategies.',
-      date: 'March 15, 2025',
-      readTime: '5 min read',
-      category: 'For Organizations',
-      subCategory: 'RPO Best Practices',
-      views: '1.2K',
-      likes: 89,
-      comments: 12,
-      featured: true,
-      author: {
-        name: 'Sarah Chen',
-        role: 'Head of RPO Strategy'
+  // Fetch blogs from API
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const query = new URLSearchParams();
+        if (activeCategory !== 'All') {
+          query.append('category', activeCategory);
+        }
+        if (searchQuery) {
+          query.append('search', searchQuery);
+        }
+        
+        const res = await fetch(`/api/blogs?${query.toString()}`);
+        const data = await res.json();
+        
+        if (data.blogs) {
+          setPosts(data.blogs);
+        }
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+      } finally {
+        setLoading(false);
       }
-    },
-    {
-      id: 2,
-      title: 'Stand Out in the U.S. IT Market: Essential Tips for Contract Professionals',
-      slug: 'stand-out-us-it-market-essential-tips-contract-professionals',
-      excerpt: 'Essential tips and career strategies for IT professionals looking to differentiate themselves and land high-value contracts through effective career support in the competitive U.S. IT market.',
-      date: 'March 10, 2025',
-      readTime: '7 min read',
-      category: 'For Professionals',
-      subCategory: 'U.S. IT Market Trends',
-      views: '2.4K',
-      likes: 156,
-      comments: 23,
-      featured: true,
-      author: {
-        name: 'Mike Rodriguez',
-        role: 'Career Advisor'
-      }
-    },
-    {
-      id: 3,
-      title: 'The Power of Global Talent Sourcing: Local Expertise Meets Global Reach',
-      slug: 'power-global-talent-sourcing-local-expertise-global-reach',
-      excerpt: 'Learn about the strategic advantages of combining local recruitment expertise with global talent acquisition capabilities for faster, better hiring through RPO services.',
-      date: 'March 5, 2025',
-      readTime: '6 min read',
-      category: 'For Organizations',
-      subCategory: 'Talent Acquisition Strategy',
-      views: '1.8K',
-      likes: 67,
-      comments: 8,
-      featured: true,
-      author: {
-        name: 'Emily Watson',
-        role: 'Global Talent Director'
-      }
-    },
-    {
-      id: 4,
-      title: 'RPO Best Practices: Optimizing Your Talent Acquisition Pipeline',
-      slug: 'rpo-best-practices-optimizing-talent-acquisition-pipeline',
-      excerpt: 'Learn how to streamline your recruitment process and improve hiring outcomes with proven RPO strategies and methodologies.',
-      date: 'February 28, 2025',
-      readTime: '8 min read',
-      category: 'For Organizations',
-      subCategory: 'RPO Best Practices',
-      views: '3.1K',
-      likes: 234,
-      comments: 31,
-      author: {
-        name: 'David Kim',
-        role: 'RPO Specialist'
-      }
-    },
-    {
-      id: 5,
-      title: 'Mastering Contract Negotiation: Strategies for IT Professionals',
-      slug: 'mastering-contract-negotiation-strategies-it-professionals',
-      excerpt: 'Essential negotiation tactics and strategies for IT contractors to secure better rates and contract terms in the competitive U.S. market.',
-      date: 'February 22, 2025',
-      readTime: '6 min read',
-      category: 'For Professionals',
-      subCategory: 'Contract Negotiation Strategies',
-      views: '1.5K',
-      likes: 78,
-      comments: 14,
-      author: {
-        name: 'Lisa Thompson',
-        role: 'Career Coach'
-      }
-    },
-    {
-      id: 6,
-      title: 'AI in Recruitment: Transforming Talent Acquisition',
-      slug: 'ai-recruitment-transforming-talent-acquisition',
-      excerpt: 'How artificial intelligence is revolutionizing the recruitment landscape and what it means for both organizations and job seekers.',
-      date: 'February 15, 2025',
-      readTime: '5 min read',
-      category: 'Industry Insights',
-      subCategory: 'Technology & Innovation in Hiring',
-      views: '2.2K',
-      likes: 145,
-      comments: 19,
-      author: {
-        name: 'Alex Turner',
-        role: 'Technology Analyst'
-      }
-    },
-    {
-      id: 7,
-      title: 'Building a Powerful Employer Brand for Talent Attraction',
-      slug: 'building-powerful-employer-brand-talent-attraction',
-      excerpt: 'Strategies for creating an employer brand that attracts top talent and reduces time-to-hire in competitive markets.',
-      date: 'February 10, 2025',
-      readTime: '4 min read',
-      category: 'For Organizations',
-      subCategory: 'Employer Branding for Hiring',
-      views: '1.9K',
-      likes: 98,
-      comments: 11,
-      author: {
-        name: 'Rachel Green',
-        role: 'Employer Brand Strategist'
-      }
-    },
-    {
-      id: 8,
-      title: 'LinkedIn Optimization for IT Professionals',
-      slug: 'linkedin-optimization-it-professionals',
-      excerpt: 'Complete guide to optimizing your LinkedIn profile to attract recruiters and land your next contract role in the U.S. market.',
-      date: 'February 5, 2025',
-      readTime: '5 min read',
-      category: 'For Professionals',
-      subCategory: 'Resume & LinkedIn Optimization',
-      views: '2.7K',
-      likes: 167,
-      comments: 22,
-      author: {
-        name: 'James Wilson',
-        role: 'Digital Presence Expert'
-      }
-    }
-  ];
+    };
+
+    fetchBlogs();
+  }, [activeCategory, searchQuery]);
 
   // Interactive functions
   const toggleSavePost = (postId) => {
@@ -295,15 +190,15 @@ const Blog = () => {
   const featuredPosts = posts.filter(post => post.featured);
   const filteredPosts = activeCategory === 'All' 
     ? posts.filter(post => 
+        !searchQuery || 
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.subCategory.toLowerCase().includes(searchQuery.toLowerCase())
+        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : posts.filter(post => 
         post.category === activeCategory &&
-        (post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         post.subCategory.toLowerCase().includes(searchQuery.toLowerCase()))
+        (!searchQuery ||
+         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()))
       );
 
   const displayedPosts = filteredPosts.slice(0, visiblePosts);
@@ -452,17 +347,25 @@ const Blog = () => {
                   <CardContent className="p-0 overflow-hidden">
                     {/* Post Image */}
                     <div className="relative h-48 bg-blue-600 overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                      {post.imageUrl ? (
+                        <>
+                          <img 
+                            src={post.imageUrl} 
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                      )}
 
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-white/90 text-gray-800 px-3 py-1 rounded-lg text-xs font-semibold">
-                          {post.subCategory}
-                        </span>
-                      </div>
 
                       {/* Author */}
                       <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-white/20 rounded-full border border-white/30"></div>
+                        <div className="w-8 h-8 bg-white/20 rounded-full border border-white/30 flex items-center justify-center text-white font-semibold text-xs">
+                          {post.author.name?.[0] || 'A'}
+                        </div>
                         <div>
                           <div className="text-white font-semibold text-sm">
                             {post.author.name}
@@ -655,7 +558,18 @@ const Blog = () => {
                 <CardContent className="p-0 overflow-hidden">
                   {/* Post Image */}
                   <div className="relative h-40 bg-blue-600 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    {post.imageUrl ? (
+                      <>
+                        <img 
+                          src={post.imageUrl} 
+                          alt={post.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    )}
 
                     <div className="absolute top-3 left-3">
                       <span className="bg-white/90 text-gray-800 px-3 py-1 rounded-lg text-xs font-semibold">

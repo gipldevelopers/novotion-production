@@ -13,7 +13,9 @@ import {
     Calendar,
     DollarSign,
     MoreVertical,
-    Eye
+    Eye,
+    Edit,
+    CheckCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -193,10 +195,10 @@ const UsersPage = () => {
                                                 <div className="text-sm font-medium text-gray-900">
                                                     {user._count?.purchases || 0} orders
                                                 </div>
-                                                {user._count?.payments > 0 && (
+                                                {user.totalSuccessfulPayments > 0 && (
                                                     <div className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                                                        <DollarSign className="h-3 w-3" />
-                                                        {user._count?.payments} paid
+                                                        {/* <DollarSign className="h-3 w-3" /> */}
+                                                        ${user.totalSuccessfulPayments.toFixed(0)} paid
                                                     </div>
                                                 )}
                                             </div>
@@ -208,6 +210,13 @@ const UsersPage = () => {
                                                     className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                                                 >
                                                     View
+                                                </Link>
+                                                <Link
+                                                    href={`/admin/users/${user.id}/edit`}
+                                                    className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                                    title="Edit"
+                                                >
+                                                    <Edit className="h-4 w-4" />
                                                 </Link>
                                                 <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
                                                     <MoreVertical className="h-4 w-4 text-gray-500" />

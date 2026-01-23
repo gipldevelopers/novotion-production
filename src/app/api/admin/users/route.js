@@ -43,6 +43,12 @@ export async function GET(request) {
                         take: 5, // Limit purchase history in list view for performance
                         orderBy: { createdAt: 'desc' }
                     },
+                    payments: {
+                        select: {
+                            amount: true,
+                            status: true
+                        }
+                    },
                     _count: {
                         select: { purchases: true, payments: true }
                     }
@@ -56,10 +62,19 @@ export async function GET(request) {
             prisma.user.count({ where })
         ]);
 
-        // Remove passwords from response
+        // Remove passwords and calculate total successful payments
         const usersWithoutPasswords = users.map(user => {
             const { password, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+            
+            // Calculate total successful payment amount
+            const totalSuccessfulPayments = user.payments
+                ?.filter(payment => payment.status === 'SUCCESS')
+                .reduce((sum, payment) => sum + payment.amount, 0) || 0;
+            
+            return {
+                ...userWithoutPassword,
+                totalSuccessfulPayments
+            };
         });
 
         return new Response(JSON.stringify({

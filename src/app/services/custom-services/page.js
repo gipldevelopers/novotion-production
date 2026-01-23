@@ -23,64 +23,40 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-// MOCK DATA - This is structured to be easily replaced by an API call in the future
-const MOCK_CUSTOM_SERVICES = [
-  {
-    id: "custom-starter",
-    name: "Custom Starter Package",
-    price: 500,
-    description:
-      "A tailored entry-level solution for professionals looking for immediate career impact and focused guidance.",
-    icon: Zap,
-    features: [
-      "Personalized Career Strategy Development",
-      "Direct Access to Senior Mentors (2 sessions)",
-      "Customized Interview Preparation",
-      "Priority Support via Email",
-      "Curated Job Referrals",
-    ],
-    color: "blue",
-    badge: "Starter",
-  },
-  {
-    id: "custom-elite",
-    name: "Custom Elite Package",
-    price: 1000,
-    description:
-      "Our most comprehensive high-end support package designed for rapid career acceleration and executive positioning.",
-    icon: Star,
-    features: [
-      "Standard Starter Package features",
-      "1-on-1 Executive Coaching Sessions (5 sessions)",
-      "Unlimited Resume & Profile Refinements",
-      "24/7 Priority WhatsApp Support",
-      "Direct Introductions to Key Hiring Managers",
-      "Salary Negotiation Support for Job Offers",
-    ],
-    badge: "Popular",
-    color: "indigo",
-  },
-];
+// Icon mapping function
+const getIconComponent = (iconName) => {
+  const iconMap = {
+    Zap,
+    Star,
+    Sparkles,
+    Shield,
+    Globe,
+    Users,
+    Briefcase,
+    Target,
+    Rocket,
+  };
+  return iconMap[iconName] || Zap; // Default to Zap if icon not found
+};
 
 const CustomServicesPage = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
-  // Simulate API Call
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true);
-      // In the future, replace this with:
-      // const res = await fetch('/api/custom-services');
-      // const data = await res.json();
-      // setServices(data);
-
-      // Simulating a small delay
-      setTimeout(() => {
-        setServices(MOCK_CUSTOM_SERVICES);
+      try {
+        const res = await fetch("/api/custom-packages");
+        const data = await res.json();
+        setServices(data);
+      } catch (error) {
+        console.error("Error fetching custom packages:", error);
+        toast.error("Failed to load custom packages");
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
     fetchServices();
@@ -127,7 +103,7 @@ const CustomServicesPage = () => {
         <div className="container mx-auto px-6 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 font-bold text-xs uppercase tracking-widest mb-6 border border-blue-500/20">
             <Sparkles className="h-4 w-4" />
-            Bespoke Career Solutions
+             Career Solutions
           </div>
           <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
             Custom <span className="text-blue-500">Service Packages</span>
@@ -159,11 +135,16 @@ const CustomServicesPage = () => {
                   )}
 
                   <div className="mb-8">
-                    <div
-                      className={`h-16 w-16 rounded-2xl ${pkg.color === "blue" ? "bg-blue-50 text-blue-600" : pkg.color === "indigo" ? "bg-indigo-50 text-indigo-600" : "bg-slate-100 text-slate-800"} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 border border-current/10 shadow-sm`}
-                    >
-                      <pkg.icon className="h-8 w-8" />
-                    </div>
+                    {(() => {
+                      const IconComponent = getIconComponent(pkg.icon);
+                      return (
+                        <div
+                          className={`h-16 w-16 rounded-2xl ${pkg.color === "blue" ? "bg-blue-50 text-blue-600" : pkg.color === "indigo" ? "bg-indigo-50 text-indigo-600" : "bg-slate-100 text-slate-800"} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 border border-current/10 shadow-sm`}
+                        >
+                          <IconComponent className="h-8 w-8" />
+                        </div>
+                      );
+                    })()}
                     <h3 className="text-3xl font-black text-slate-900 mb-3">
                       {pkg.name}
                     </h3>

@@ -19,6 +19,7 @@ import {
   Home,
   ArrowLeft,
   MoreVertical,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -28,6 +29,7 @@ const UserDetailPage = () => {
   const { id } = useParams("id");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [suspending, setSuspending] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -69,6 +71,45 @@ const UserDetailPage = () => {
     }, 0) || 0;
 
   const totalPurchases = user.purchases?.length || 0;
+  const totalPayments = user.payments?.length || 0;
+  const successfulPayments = user.payments?.filter(p => p.status === 'SUCCESS').length || 0;
+
+  const handleSuspend = async () => {
+    if (user.role === 'ADMIN') {
+      toast.error('Cannot suspend admin accounts');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to ${user.status === 'SUSPENDED' ? 'unsuspend' : 'suspend'} this user?`)) {
+      return;
+    }
+
+    setSuspending(true);
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message || `User ${user.status === 'SUSPENDED' ? 'unsuspended' : 'suspended'} successfully`);
+        // Refresh user data
+        const refreshRes = await fetch(`/api/admin/users/${id}`);
+        const refreshData = await refreshRes.json();
+        if (refreshRes.ok) {
+          setUser(refreshData.user);
+        }
+      } else {
+        toast.error(data.error || 'Failed to update user status');
+      }
+    } catch (error) {
+      toast.error('Failed to update user status');
+    } finally {
+      setSuspending(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -87,12 +128,36 @@ const UserDetailPage = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200">
+          <Link
+            href={`/admin/users/${user.id}/edit`}
+            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
+          >
             Edit User
-          </button>
-          <button className="px-4 py-2 bg-red-600 text-sm font-medium text-white hover:bg-red-700 rounded-lg transition-colors">
-            Suspend
-          </button>
+          </Link>
+          {user.role !== 'ADMIN' && (
+            <button
+              onClick={handleSuspend}
+              disabled={suspending}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 ${
+                user.status === 'SUSPENDED'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-red-600 hover:bg-red-700'
+              }`}
+            >
+              {suspending ? (
+                'Processing...'
+              ) : user.status === 'SUSPENDED' ? (
+                'Unsuspend'
+              ) : (
+                'Suspend'
+              )}
+            </button>
+          )}
+          {user.status === 'SUSPENDED' && (
+            <span className="px-3 py-2 text-sm font-medium bg-red-100 text-red-800 rounded-lg">
+              Suspended
+            </span>
+          )}
         </div>
       </div>
 
@@ -109,25 +174,32 @@ const UserDetailPage = () => {
                 {user.name || "No Name"}
               </h2>
               <p className="text-sm text-gray-500 mb-4">{user.email}</p>
-              <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                  user.role === "ADMIN"
-                    ? "bg-purple-100 text-purple-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {user.role === "ADMIN" ? (
-                  <>
-                    <Shield className="h-3 w-3 mr-1" />
-                    Admin
-                  </>
-                ) : (
-                  <>
-                    <User className="h-3 w-3 mr-1" />
-                    User
-                  </>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                    user.role === "ADMIN"
+                      ? "bg-purple-100 text-purple-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {user.role === "ADMIN" ? (
+                    <>
+                      <Shield className="h-3 w-3 mr-1" />
+                      Admin
+                    </>
+                  ) : (
+                    <>
+                      <User className="h-3 w-3 mr-1" />
+                      User
+                    </>
+                  )}
+                </span>
+                {user.status === 'SUSPENDED' && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    Suspended
+                  </span>
                 )}
-              </span>
+              </div>
             </div>
 
             {/* Contact Info */}
@@ -238,11 +310,11 @@ const UserDetailPage = () => {
             </div>
           </div>
 
-          {/* Recent Purchases */}
+          {/* Total Payments */}
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
-                Recent Purchases
+                Total Payments
               </h3>
               <p className="text-sm text-gray-500">User's order history</p>
             </div>
@@ -299,13 +371,13 @@ const UserDetailPage = () => {
               ) : (
                 <div className="p-8 text-center">
                   <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <ShoppingBag className="h-6 w-6 text-gray-400" />
+                    <CreditCard className="h-6 w-6 text-gray-400" />
                   </div>
                   <h4 className="text-lg font-medium text-gray-900 mb-2">
-                    No purchases yet
+                    No payments yet
                   </h4>
                   <p className="text-gray-500">
-                    This user hasn't made any purchases.
+                    This user hasn't made any payments.
                   </p>
                 </div>
               )}

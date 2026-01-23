@@ -14,6 +14,7 @@ model User {
   email         String    @unique
   password      String
   role          Role      @default(USER)
+  status        String    @default("ACTIVE") // ACTIVE, SUSPENDED
   name          String?
   image         String?
   phone         String?
@@ -26,6 +27,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   payments      Payment[]
   purchases     Purchase[]
+  blogs         Blog[]
 }
 
 enum Role {
@@ -75,4 +77,53 @@ model ContactMessage {
   status     String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String   @db.Text
+  category    String
+  subCategory String?
+  featured    Boolean  @default(false)
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  comments    Int      @default(0)
+  readTime    String?
+  tags        String[] @default([])
+  authorName  String?
+  authorRole  String?
+  authorBio   String?  @db.Text
+  imageUrl    String?
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TopicSuggestion {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  topic      String
+  message    String?  @db.Text
+  status     String   @default("NEW") // NEW, REVIEWED, IMPLEMENTED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model CustomPackage {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  description String   @db.Text
+  features    String[] @default([])
+  color       String   @default("blue") // blue, indigo, etc.
+  badge       String?  // Starter, Popular, etc.
+  icon        String   @default("Zap") // Icon name from lucide-react
+  isSeed      Boolean  @default(false) // true for seed packages, false for admin-created
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
