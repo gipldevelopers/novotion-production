@@ -309,7 +309,7 @@ const ServicesRPO = () => {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center">
             <div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"><AnimatedCounter value="500" />+</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"><AnimatedCounter value="14" />+</div>
               <div className="text-blue-100 text-xs sm:text-sm">Organizations Served</div>
             </div>
             <div>
