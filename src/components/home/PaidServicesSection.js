@@ -206,7 +206,10 @@ const PaidServicesSection = () => {
 
                   <div className="mb-8">
                     <div className="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                      <pkg.icon className="h-7 w-7 text-blue-600" />
+                      {(() => {
+                        const Icon = pkg.icon;
+                        return <Icon className="h-7 w-7 text-blue-600" />;
+                      })()}
                     </div>
                     <h4 className="text-2xl font-black text-slate-900 mb-2">{pkg.name}</h4>
                     <p className="text-slate-500 text-sm leading-relaxed">{pkg.description}</p>
@@ -337,7 +340,10 @@ const PaidServicesSection = () => {
                 {proServices.map((service, idx) => (
                   <div key={idx} className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300">
                     <div className="h-10 w-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <service.icon className="h-5 w-5 text-blue-400" />
+                      {(() => {
+                        const Icon = service.icon;
+                        return <Icon className="h-5 w-5 text-blue-400" />;
+                      })()}
                     </div>
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-bold text-white text-sm whitespace-nowrap">{service.name}</h5>
@@ -369,8 +375,10 @@ const PaidServicesSection = () => {
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center text-center p-4">
               <div className="h-10 w-10 text-blue-600 mb-3 opacity-80">
-                {/* Using Icons directly from imports */}
-                <item.icon className="h-full w-full" />
+                {(() => {
+                  const Icon = item.icon;
+                  return <Icon className="h-full w-full" />;
+                })()}
               </div>
               <p className="text-slate-900 font-black text-sm tracking-tight">{item.text}</p>
               <p className="text-xs text-slate-400 uppercase font-bold tracking-tighter mt-1">{item.label}</p>
