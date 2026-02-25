@@ -277,7 +277,10 @@ const ServicesSection = () => {
                     : 'text-gray-700 hover:text-primary hover:bg-gray-200'
                   }`}
               >
-                <service.icon className="h-4 w-4" />
+                {(() => {
+                  const Icon = service.icon;
+                  return <Icon className="h-4 w-4" />;
+                })()}
                 {service.subtitle}
               </button>
             ))}
@@ -293,7 +296,10 @@ const ServicesSection = () => {
               {/* ICON PANEL */}
               <div className="md:col-span-2 flex justify-center md:justify-start">
                 <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center shadow-md">
-                  <currentService.icon className="h-8 w-8 text-white" />
+                  {(() => {
+                    const Icon = currentService.icon;
+                    return <Icon className="h-8 w-8 text-white" />;
+                  })()}
                 </div>
               </div>
 
