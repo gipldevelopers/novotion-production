@@ -16,33 +16,33 @@ const WhyChooseUs = () => {
   }, []);
 
   const features = [
-    { 
-      icon: Globe, 
-      title: 'Global Reach, Personal Touch', 
+    {
+      icon: Globe,
+      title: 'Global Reach, Personal Touch',
       description: 'Our recruitment solutions operate across three continents, but you\'ll always have a dedicated consultant who knows your name, understands your talent acquisition goals, and genuinely cares about your success.',
       color: 'primary'
     },
-    { 
-      icon: Award, 
-      title: 'Industry Expertise', 
+    {
+      icon: Award,
+      title: 'Industry Expertise',
       description: 'Our RPO services teams specialize in 15+ industries from tech and healthcare to finance and engineering. We speak your language and understand what makes your sector\'s hiring process unique.',
       color: 'primary'
     },
-    { 
-      icon: Shield, 
-      title: 'Transparency You Can Trust', 
+    {
+      icon: Shield,
+      title: 'Transparency You Can Trust',
       description: 'No hidden fees in our recruitment process outsourcing. No surprises. Just honest communication and measurable talent acquisition results at every step.',
       color: 'primary'
     },
-    { 
-      icon: Users, 
-      title: 'End-to-End Partnership', 
+    {
+      icon: Users,
+      title: 'End-to-End Partnership',
       description: 'We\'re not here for quick transactions. Whether it\'s your first conversation about workforce management or five years into our RPO partnership, we remain committed to your long-term success.',
       color: 'primary'
     },
-    { 
-      icon: Zap, 
-      title: '24/7 Support', 
+    {
+      icon: Zap,
+      title: '24/7 Support',
       description: 'With teams across time zones, our recruitment solutions never sleep ensuring no career opportunity or hiring need slips through the cracks.',
       color: 'primary'
     },
@@ -102,7 +102,10 @@ const WhyChooseUs = () => {
 
                 <div className="flex items-center gap-4 mb-4">
                   <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-                    <currentFeature.icon className="h-6 w-6 text-white" />
+                    {(() => {
+                      const Icon = currentFeature.icon;
+                      return <Icon className="h-6 w-6 text-white" />;
+                    })()}
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-900">
@@ -122,8 +125,8 @@ const WhyChooseUs = () => {
                         key={index}
                         onClick={() => setActiveFeature(index)}
                         className={`w-2 h-2 rounded-full transition-all duration-300
-                          ${activeFeature === index 
-                            ? 'bg-primary w-3' 
+                          ${activeFeature === index
+                            ? 'bg-primary w-3'
                             : 'bg-gray-300'
                           }`}
                       />
@@ -145,14 +148,17 @@ const WhyChooseUs = () => {
                   key={index}
                   onMouseEnter={() => setActiveFeature(index)}
                   className={`group bg-white rounded-xl p-4 border transition-all cursor-pointer 
-                    ${activeFeature === index 
-                      ? 'border-primary shadow-md scale-105' 
+                    ${activeFeature === index
+                      ? 'border-primary shadow-md scale-105'
                       : 'border-gray-100 hover:border-gray-200'
                     }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <feature.icon className="h-5 w-5 text-white" />
+                      {(() => {
+                        const Icon = feature.icon;
+                        return <Icon className="h-5 w-5 text-white" />;
+                      })()}
                     </div>
 
                     <h3 className="font-semibold text-gray-900 text-sm">
@@ -173,7 +179,7 @@ const WhyChooseUs = () => {
               { value: '15+', label: 'Industries' },
               { value: '24/7', label: 'Support' },
             ].map((stat, index) => (
-              <div 
+              <div
                 key={index}
                 className="text-center group"
               >
