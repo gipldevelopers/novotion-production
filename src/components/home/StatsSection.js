@@ -9,7 +9,7 @@ const StatsSection = () => {
 
   useEffect(() => {
     setMounted(true);
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -28,30 +28,30 @@ const StatsSection = () => {
   }, [counted]);
 
   const stats = [
-    { 
-      value: '500+', 
-      label: 'Organizations Partnered', 
+    {
+      value: '500+',
+      label: 'Organizations Partnered',
       delay: '100',
       icon: Building,
       description: 'For RPO services since 2021'
     },
-    { 
-      value: '7,000+', 
-      label: 'Professionals Placed', 
+    {
+      value: '7,000+',
+      label: 'Professionals Placed',
       delay: '200',
       icon: Users,
       description: 'Through career support services'
     },
-    { 
-      value: '15+', 
-      label: 'Industries Covered', 
+    {
+      value: '15+',
+      label: 'Industries Covered',
       delay: '300',
       icon: TrendingUp,
       description: 'With specialized talent acquisition'
     },
-    { 
-      value: '2', 
-      label: 'Global Offices', 
+    {
+      value: '2',
+      label: 'Global Offices',
       delay: '400',
       icon: MapPin,
       description: 'India, USA delivering solutions'
@@ -77,8 +77,8 @@ const StatsSection = () => {
   }
 
   return (
-    <section 
-      id="stats-section" 
+    <section
+      id="stats-section"
       className="min-h-[40vh] md:min-h-[60vh] flex items-center bg-primary text-white relative overflow-hidden py-8 md:py-12"
     >
       {/* Background bubbles */}
@@ -88,7 +88,7 @@ const StatsSection = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        
+
         {/* Section Header */}
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3">
@@ -105,8 +105,8 @@ const StatsSection = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
           {stats.map((stat, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="text-center observe group transition-all"
               style={{ animationDelay: `${stat.delay}ms` }}
             >
@@ -114,7 +114,10 @@ const StatsSection = () => {
               <div className="relative inline-flex items-center justify-center mb-3">
                 <div className="absolute inset-0 bg-white/10 rounded-full scale-125 transition-transform group-hover:scale-110"></div>
                 <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-3 group-hover:bg-white/20 transition-all">
-                  <stat.icon className="h-6 w-6 text-secondary" />
+                  {(() => {
+                    const Icon = stat.icon;
+                    return <Icon className="h-6 w-6 text-secondary" />;
+                  })()}
                 </div>
               </div>
 
@@ -141,8 +144,8 @@ const StatsSection = () => {
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
             <div className="flex -space-x-2">
               {[1, 2, 3].map((item) => (
-                <div 
-                  key={item} 
+                <div
+                  key={item}
                   className="w-6 h-6 bg-secondary rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-gray-900"
                 >
                   {item}
