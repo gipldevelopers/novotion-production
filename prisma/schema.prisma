@@ -10,24 +10,29 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  role          Role      @default(USER)
-  status        String    @default("ACTIVE") // ACTIVE, SUSPENDED
-  name          String?
-  image         String?
-  phone         String?
-  address       String?
-  city          String?
-  state         String?
-  postalCode    String?
-  country       String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  payments      Payment[]
-  purchases     Purchase[]
-  blogs         Blog[]
+  id               String    @id @default(cuid())
+  email            String    @unique
+  password         String?
+  role             Role      @default(USER)
+  status           String    @default("ACTIVE") // ACTIVE, SUSPENDED
+  name             String?
+  image            String?
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  postalCode       String?
+  country          String?
+  provider         String    @default("credentials")
+  googleId         String?   @unique
+  profileImage     String?
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  payments         Payment[]
+  purchases        Purchase[]
+  blogs            Blog[]
 }
 
 enum Role {

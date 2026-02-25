@@ -7,10 +7,7 @@
     "email": "developer@gohilinfotech.com",
     "name": "Gohil Infotech Private Limited",
     "url": "https://gohilinfotech.com/"
-    
   },
- 
-
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,7 +16,8 @@
     "prisma": "prisma",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:seed": "npx prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
@@ -31,6 +29,7 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.553.0",
     "next": "16.0.10",
+    "nodemailer": "^8.0.1",
     "payglocal-js-client": "github:PayGlocal-Technologies/payglocal-js-client",
     "react": "19.2.0",
     "react-country-flag": "^3.1.0",
