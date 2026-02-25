@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendPaymentReceiptEmail, sendAdminPaymentNotification } from "@/lib/mail";
 
 export async function POST(request) {
   try {
@@ -50,7 +51,7 @@ export async function POST(request) {
       if (payment && payment.status === 'PENDING') {
         const isSuccess = ['SENT_FOR_CAPTURE', 'SUCCESS', 'COMPLETED'].includes(status);
 
-        await prisma.payment.update({
+        const updatedPayment = await prisma.payment.update({
           where: { id: payment.id },
           data: {
             status: isSuccess ? 'SUCCESS' : 'FAILED',
@@ -63,12 +64,13 @@ export async function POST(request) {
 
         if (isSuccess) {
           // Record the purchases if not already done
-          const existingPurchases = await prisma.purchase.findFirst({
-            where: { userId: payment.userId, createdAt: { gte: payment.createdAt } }
+          const existingPurchasesCount = await prisma.purchase.count({
+            where: { paymentId: payment.id }
           });
 
-          if (!existingPurchases) {
+          if (existingPurchasesCount === 0) {
             const cart = payment.metadata?.cart || [];
+            const items = [];
             for (const item of cart) {
               await prisma.purchase.create({
                 data: {
@@ -77,9 +79,19 @@ export async function POST(request) {
                   itemName: item.name,
                   itemPrice: item.price,
                   type: item.type || 'SERVICE',
-                  status: 'ACTIVE'
+                  status: 'ACTIVE',
+                  paymentId: payment.id
                 }
               });
+              items.push({ name: item.name, price: item.price });
+            }
+
+            // Trigger Emails
+            try {
+              await sendPaymentReceiptEmail(payment.user, updatedPayment, items);
+              await sendAdminPaymentNotification(updatedPayment, payment.user, items);
+            } catch (emailError) {
+              console.error('Error triggering emails in webhook:', emailError);
             }
           }
         }

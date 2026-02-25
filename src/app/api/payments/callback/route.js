@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendPaymentReceiptEmail, sendAdminPaymentNotification } from "@/lib/mail";
 
 export async function POST(request) {
     return handleCallback(request);
@@ -67,7 +68,7 @@ async function handleCallback(request) {
         if (payment) {
             const isSuccess = ['SENT_FOR_CAPTURE', 'SUCCESS', 'COMPLETED'].includes(status);
 
-            await prisma.payment.update({
+            const updatedPayment = await prisma.payment.update({
                 where: { id: payment.id },
                 data: {
                     status: isSuccess ? 'SUCCESS' : 'FAILED',
@@ -78,21 +79,32 @@ async function handleCallback(request) {
                 }
             });
 
-            if (isSuccess) {
+            if (isSuccess && payment.status !== 'SUCCESS') {
                 // Record the purchases
                 const cart = payment.metadata?.cart || [];
+                const items = [];
 
                 for (const item of cart) {
-                    await prisma.purchase.create({
+                    const purchase = await prisma.purchase.create({
                         data: {
                             userId: payment.userId,
                             itemId: String(item.id),
                             itemName: item.name,
                             itemPrice: item.price,
                             type: item.type || 'SERVICE',
-                            status: 'ACTIVE'
+                            status: 'ACTIVE',
+                            paymentId: payment.id
                         }
                     });
+                    items.push({ name: item.name, price: item.price });
+                }
+
+                // Send Emails in background
+                try {
+                    await sendPaymentReceiptEmail(payment.user, updatedPayment, items);
+                    await sendAdminPaymentNotification(updatedPayment, payment.user, items);
+                } catch (emailError) {
+                    console.error('Error triggering emails:', emailError);
                 }
             }
         }
