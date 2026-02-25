@@ -25,6 +25,17 @@ export async function PUT(req) {
         const body = await req.json();
         const { name, phone, address, city, state, postalCode, country, password } = body;
 
+        // Server-side validation
+        if (phone && phone.trim() !== "") {
+            const phoneRegex = /^\+?[0-9\s\-()]{10,20}$/;
+            if (!phoneRegex.test(phone)) {
+                return new Response(JSON.stringify({ error: "Invalid phone number format" }), {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+        }
+
         const updateData = {
             name,
             phone,
