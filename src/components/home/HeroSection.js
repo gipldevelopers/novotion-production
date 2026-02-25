@@ -90,14 +90,18 @@ const HeroSection = () => {
     },
   ];
 
-  // Auto slide change
+  // Preload images
+  useEffect(() => {
+    slides.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, [slides]);
+
+  // Auto slide change - removed the transition delay that caused blanking
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentSlide((prev) => (prev + 1) % slides.length);
-        setIsTransitioning(false);
-      }, 300);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
 
     return () => clearInterval(interval);
@@ -105,11 +109,7 @@ const HeroSection = () => {
 
   const goToSlide = (index) => {
     if (index === currentSlide) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentSlide(index);
-      setIsTransitioning(false);
-    }, 300);
+    setCurrentSlide(index);
   };
 
   const currentSlideData = slides[currentSlide];
@@ -285,8 +285,8 @@ const HeroSection = () => {
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                {/* Main Image */}
-                <AnimatePresence mode="wait">
+                {/* Main Image - Removed mode="wait" for cross-fade and added absolute positioning */}
+                <AnimatePresence>
                   <motion.img
                     key={currentSlideData.image}
                     src={currentSlideData.image}
@@ -294,8 +294,8 @@ const HeroSection = () => {
                     className="absolute inset-0 w-full h-full object-cover"
                     initial={{ opacity: 0, scale: 1.05 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.4 }}
+                    exit={{ opacity: 0, scale: 1 }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
                   />
                 </AnimatePresence>
 
