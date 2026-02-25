@@ -24,6 +24,7 @@ export default function ProfilePage() {
     country: "",
     password: "",
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,13 +57,43 @@ export default function ProfilePage() {
     fetchUser();
   }, [router]);
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const validatePhone = (phone) => {
+    // Regex for international phone numbers: supports +, spaces, dashes, parentheses and 10-15 digits
+    const re = /^\+?[0-9\s\-()]{10,20}$/;
+    return re.test(String(phone));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when user changes input
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validation
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (formData.phone && !validatePhone(formData.phone)) {
+      newErrors.phone = "Please enter a valid phone number (10-15 digits)";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetch("/api/auth/profile", {
@@ -145,8 +176,9 @@ export default function ProfilePage() {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full h-12 px-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all outline-none text-sm"
+                        className={`w-full h-12 px-4 rounded-xl border ${errors.name ? 'border-red-500 focus:ring-red-100' : 'border-gray-200 focus:ring-blue-100'} focus:border-blue-600 transition-all outline-none text-sm`}
                       />
+                      {errors.name && <p className="text-xs text-red-500 font-medium">{errors.name}</p>}
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -156,8 +188,10 @@ export default function ProfilePage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full h-12 px-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all outline-none text-sm"
+                        placeholder="+1 234 567 8900"
+                        className={`w-full h-12 px-4 rounded-xl border ${errors.phone ? 'border-red-500 focus:ring-red-100' : 'border-gray-200 focus:ring-blue-100'} focus:border-blue-600 transition-all outline-none text-sm`}
                       />
+                      {errors.phone && <p className="text-xs text-red-500 font-medium">{errors.phone}</p>}
                     </div>
                   </div>
 
