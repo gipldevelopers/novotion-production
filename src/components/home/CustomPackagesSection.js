@@ -134,7 +134,10 @@ const CustomPackagesSection = () => {
 
                                 <div className="mb-8">
                                     <div className={`h-16 w-16 rounded-2xl ${pkg.color === 'blue' ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 border border-current/10`}>
-                                        <pkg.icon className="h-8 w-8" />
+                                        {(() => {
+                                            const Icon = getIconComponent(pkg.icon);
+                                            return <Icon className="h-8 w-8" />;
+                                        })()}
                                     </div>
                                     <h3 className="text-3xl font-black text-slate-900 mb-3">{pkg.name}</h3>
                                     <p className="text-slate-500 leading-relaxed font-medium">{pkg.description}</p>
