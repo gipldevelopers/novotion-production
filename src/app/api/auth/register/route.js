@@ -13,6 +13,14 @@ export async function POST(request) {
             });
         }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return new Response(JSON.stringify({ error: "Invalid email address format" }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
+
         const existingUser = await prisma.user.findUnique({
             where: { email },
         });
