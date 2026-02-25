@@ -140,6 +140,9 @@ const UsersPage = () => {
                                     Purchases
                                 </th>
                                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Type
+                                </th>
+                                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Actions
                                 </th>
                             </tr>
@@ -162,11 +165,10 @@ const UsersPage = () => {
                                             </Link>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                user.role === 'ADMIN'
-                                                    ? 'bg-purple-100 text-purple-800'
-                                                    : 'bg-gray-100 text-gray-800'
-                                            }`}>
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.role === 'ADMIN'
+                                                ? 'bg-purple-100 text-purple-800'
+                                                : 'bg-gray-100 text-gray-800'
+                                                }`}>
                                                 {user.role === 'ADMIN' ? (
                                                     <>
                                                         <Shield className="h-3 w-3 mr-1" />
@@ -202,6 +204,14 @@ const UsersPage = () => {
                                                     </div>
                                                 )}
                                             </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`text-xs font-bold px-2 py-1 rounded-md ${user.provider === 'google'
+                                                    ? 'bg-blue-50 text-blue-600 border border-blue-100'
+                                                    : 'bg-slate-50 text-slate-600 border border-slate-100'
+                                                }`}>
+                                                {user.provider === 'google' ? 'Google' : 'Normal'}
+                                            </span>
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-2">
@@ -247,6 +257,9 @@ const UsersPage = () => {
                                             <div className="h-4 w-20 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="py-4 px-6">
+                                            <div className="h-6 w-16 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="py-4 px-6">
                                             <div className="h-8 w-16 bg-gray-200 rounded-lg"></div>
                                         </td>
                                     </tr>
@@ -254,7 +267,7 @@ const UsersPage = () => {
                             )}
                         </tbody>
                     </table>
-                    
+
                     {!loading && users.length === 0 && (
                         <div className="py-12 text-center">
                             <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -296,11 +309,10 @@ const UsersPage = () => {
                                         <button
                                             key={pageNum}
                                             onClick={() => handlePageChange(pageNum)}
-                                            className={`h-8 w-8 flex items-center justify-center rounded-lg text-sm font-medium ${
-                                                pagination.page === pageNum
-                                                    ? 'bg-blue-600 text-white'
-                                                    : 'text-gray-700 hover:bg-gray-50'
-                                            } transition-colors`}
+                                            className={`h-8 w-8 flex items-center justify-center rounded-lg text-sm font-medium ${pagination.page === pageNum
+                                                ? 'bg-blue-600 text-white'
+                                                : 'text-gray-700 hover:bg-gray-50'
+                                                } transition-colors`}
                                         >
                                             {pageNum}
                                         </button>

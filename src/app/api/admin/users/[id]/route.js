@@ -154,7 +154,7 @@ export async function PATCH(request, { params }) {
 
         // Toggle suspend status
         const newStatus = existing.status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
-        
+
         const updatedUser = await prisma.user.update({
             where: { id },
             data: {
@@ -164,7 +164,7 @@ export async function PATCH(request, { params }) {
 
         const { password, ...userWithoutPassword } = updatedUser;
 
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
             user: userWithoutPassword,
             message: `User ${newStatus === 'SUSPENDED' ? 'suspended' : 'unsuspended'} successfully`
         }), {

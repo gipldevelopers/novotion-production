@@ -65,12 +65,12 @@ export async function GET(request) {
         // Remove passwords and calculate total successful payments
         const usersWithoutPasswords = users.map(user => {
             const { password, ...userWithoutPassword } = user;
-            
+
             // Calculate total successful payment amount
             const totalSuccessfulPayments = user.payments
                 ?.filter(payment => payment.status === 'SUCCESS')
                 .reduce((sum, payment) => sum + payment.amount, 0) || 0;
-            
+
             return {
                 ...userWithoutPassword,
                 totalSuccessfulPayments
