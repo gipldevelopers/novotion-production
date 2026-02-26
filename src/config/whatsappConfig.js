@@ -1,5 +1,5 @@
 export const whatsappConfig = {
-    phoneNumber: "919316537724", // Updated to your real WhatsApp number.
+    phoneNumber: "919362896291", // Updated to your real WhatsApp number.
     companyName: "Novotion",
     onlineStatus: "Online now",
     welcomeMessage: "Hi! Need help choosing the right package? I can guide you through our services! 🚀",
