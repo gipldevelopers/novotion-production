@@ -164,9 +164,9 @@ const AdminDashboard = () => {
         />
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 min-w-0">
         {/* Recent Orders */}
-        <div className="lg:col-span-2 bg-white border rounded-xl">
+        <div className="lg:col-span-2 bg-white border rounded-xl min-w-0">
           <div className="p-4 border-b flex justify-between">
             <h2 className="font-semibold">Recent Orders</h2>
             <Link
@@ -177,48 +177,50 @@ const AdminDashboard = () => {
             </Link>
           </div>
 
-          <table className="w-full">
-            <thead className="bg-gray-50 text-xs text-gray-500">
-              <tr>
-                <th className="p-3 text-left">Customer</th>
-                <th className="p-3 text-left">Product</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Amount</th>
-                <th className="p-3">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentPurchases.map((p) => (
-                <tr key={p.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{p.user?.email}</td>
-                  <td className="p-3">{p.itemName}</td>
-                  <td className="p-3">
-                    <span className="flex items-center gap-1 text-xs">
-                      {p.status === "ACTIVE" && (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                      )}
-                      {p.status === "PENDING" && (
-                        <Clock className="h-4 w-4 text-yellow-600" />
-                      )}
-                      {p.status}
-                    </span>
-                  </td>
-                  <td className="p-3 font-semibold">${p.itemPrice}</td>
-                  <td className="p-3 text-center">
-                    <Link href={`/admin/users/${p.userId}`}>
-                      <Eye className="h-4 w-4 text-gray-500" />
-                    </Link>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead className="bg-gray-50 text-xs text-gray-500">
+                <tr>
+                  <th className="p-3 text-left">Customer</th>
+                  <th className="p-3 text-left">Product</th>
+                  <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Amount</th>
+                  <th className="p-3">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentPurchases.map((p) => (
+                  <tr key={p.id} className="border-t hover:bg-gray-50">
+                    <td className="p-3 max-w-[220px] truncate">{p.user?.email}</td>
+                    <td className="p-3 max-w-[220px] truncate">{p.itemName}</td>
+                    <td className="p-3">
+                      <span className="flex items-center gap-1 text-xs">
+                        {p.status === "ACTIVE" && (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        )}
+                        {p.status === "PENDING" && (
+                          <Clock className="h-4 w-4 text-yellow-600" />
+                        )}
+                        {p.status}
+                      </span>
+                    </td>
+                    <td className="p-3 font-semibold whitespace-nowrap">${p.itemPrice}</td>
+                    <td className="p-3 text-center">
+                      <Link href={`/admin/users/${p.userId}`}>
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Right Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           {/* Messages */}
-          <div className="bg-white border rounded-xl">
+          <div className="bg-white border rounded-xl min-w-0">
             <div className="p-4 border-b">
               <h2 className="font-semibold">Recent Messages</h2>
             </div>
@@ -227,21 +229,23 @@ const AdminDashboard = () => {
               <Link
                 key={m.id}
                 href={`/admin/messages/${m.id}`}
-                className="flex items-start gap-3 p-4 border-t hover:bg-gray-50"
+                className="flex items-start gap-3 p-4 border-t hover:bg-gray-50 min-w-0"
               >
                 <div className="p-2 bg-blue-100 rounded-full">
                   <MessageSquare className="h-4 w-4 text-blue-600" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm">{m.fullName}</p>
-                  <p className="text-xs text-gray-500 truncate">{m.message}</p>
+                  <p className="text-xs text-gray-500 truncate block max-w-full">
+                    {m.message}
+                  </p>
                 </div>
               </Link>
             ))}
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white border rounded-xl">
+          <div className="bg-white border rounded-xl min-w-0">
             <div className="p-4 border-b">
               <h2 className="font-semibold">Quick Actions</h2>
             </div>

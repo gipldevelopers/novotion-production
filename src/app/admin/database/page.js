@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   Database,
@@ -10,14 +10,29 @@ import {
   ShieldAlert,
   Upload,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 const AdminDatabasePage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);
+  const adminModeToken = searchParams.get("mode");
+  const canAccessDatabase = adminModeToken === "super-acceess-token-gipl9011";
+
+  useEffect(() => {
+    if (!canAccessDatabase) {
+      router.replace("/admin");
+    }
+  }, [canAccessDatabase, router]);
+
+  if (!canAccessDatabase) {
+    return null;
+  }
 
   const handleExport = async () => {
     setIsExporting(true);

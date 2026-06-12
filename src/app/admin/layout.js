@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -24,7 +24,10 @@ const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [user, setUser] = useState(null);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const adminModeToken = searchParams.get("mode");
+  const showDatabaseSection = adminModeToken === "super-acceess-token-gipl9011";
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,12 +66,11 @@ const AdminLayout = ({ children }) => {
     { href: "/admin/messages", label: "Messages", icon: MessageSquare },
     { href: "/admin/blogs", label: "Blogs", icon: FileText },
     { href: "/admin/packages", label: "Packages", icon: Package },
-    { href: "/admin/database", label: "Database", icon: Database },
     // { href: "/admin/topic-suggestions", label: "Topic Suggestions", icon: Lightbulb },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
       {/* Sidebar */}
       <aside className="bg-white border-r border-gray-200 fixed top-0 left-0 h-screen w-64 z-50 flex flex-col">
         {/* Logo */}
@@ -105,6 +107,19 @@ const AdminLayout = ({ children }) => {
               </Link>
             );
           })}
+          {showDatabaseSection && (
+            <Link
+              href="/admin/database?mode=super-acceess-token-gipl9011"
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
+                pathname === "/admin/database"
+                  ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <Database className="h-5 w-5" />
+              <span className="text-sm font-medium">Database</span>
+            </Link>
+          )}
         </nav>
 
         {/* Sidebar Footer */}
@@ -135,7 +150,7 @@ const AdminLayout = ({ children }) => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen ml-64">
+      <div className="flex-1 flex flex-col min-h-screen ml-64 min-w-0">
         {/* Header */}
         <header className="sticky top-0 z-40 bg-white border-b">
           <div className="h-16 px-6 flex items-center justify-between">
@@ -182,8 +197,8 @@ const AdminLayout = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6">
-          <div className="max-w-full">{children}</div>
+        <main className="flex-1 p-6 overflow-x-hidden">
+          <div className="max-w-full min-w-0">{children}</div>
         </main>
       </div>
     </div>

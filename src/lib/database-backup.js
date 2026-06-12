@@ -57,14 +57,14 @@ const RESTORE_ORDER = [
 ];
 
 const DELETE_ORDER = [
-  "purchases",
-  "blogs",
-  "payments",
-  "users",
+  "purchase",
+  "blog",
+  "payment",
+  "user",
   "emailQueue",
-  "contactMessages",
-  "topicSuggestions",
-  "customPackages",
+  "contactMessage",
+  "topicSuggestion",
+  "customPackage",
 ];
 
 function toBackupRecord(record) {
@@ -127,8 +127,8 @@ export async function restoreDatabaseBackup(backup) {
   }
 
   await prisma.$transaction(async (tx) => {
-    for (const tableName of DELETE_ORDER) {
-      await tx[tableName].deleteMany({});
+    for (const modelName of DELETE_ORDER) {
+      await tx[modelName].deleteMany({});
     }
 
     for (const { key, modelName, dateFields } of TABLES) {
