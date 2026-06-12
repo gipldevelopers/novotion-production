@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -20,14 +20,95 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+const ADMIN_MODE_TOKEN = "super-acceess-token-gipl9011";
+
+const AdminSidebar = ({ user, pathname, onLogout, navItems }) => {
+  const searchParams = useSearchParams();
+  const showDatabaseSection = searchParams.get("mode") === ADMIN_MODE_TOKEN;
+
+  return (
+    <aside className="bg-white border-r border-gray-200 fixed top-0 left-0 h-screen w-64 z-50 flex flex-col">
+      <div className="h-16 px-4 flex items-center border-b">
+        <Link href="/admin" className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">N</span>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900">Novotion</p>
+            <p className="text-xs text-gray-500">Admin Panel</p>
+          </div>
+        </Link>
+      </div>
+
+      <nav className="flex-1 py-6 px-2 space-y-1">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          const Icon = item.icon;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
+                isActive
+                  ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="text-sm font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
+
+        {showDatabaseSection && (
+          <Link
+            href={`/admin/database?mode=${ADMIN_MODE_TOKEN}`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
+              pathname === "/admin/database"
+                ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+          >
+            <Database className="h-5 w-5" />
+            <span className="text-sm font-medium">Database</span>
+          </Link>
+        )}
+      </nav>
+
+      <div className="p-4 border-t">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
+              {user?.name?.[0] || "A"}
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+              <ShieldCheck className="h-2 w-2 text-white" />
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <p className="text-sm font-semibold">{user?.name || "Admin"}</p>
+            <p className="text-xs text-gray-500">Administrator</p>
+          </div>
+
+          <button
+            onClick={onLogout}
+            className="p-2 hover:bg-red-50 rounded-lg text-red-600"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+};
+
 const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [user, setUser] = useState(null);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const adminModeToken = searchParams.get("mode");
-  const showDatabaseSection = adminModeToken === "super-acceess-token-gipl9011";
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -71,83 +152,14 @@ const AdminLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
-      {/* Sidebar */}
-      <aside className="bg-white border-r border-gray-200 fixed top-0 left-0 h-screen w-64 z-50 flex flex-col">
-        {/* Logo */}
-        <div className="h-16 px-4 flex items-center border-b">
-          <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">Novotion</p>
-              <p className="text-xs text-gray-500">Admin Panel</p>
-            </div>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 py-6 px-2 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-sm font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-          {showDatabaseSection && (
-            <Link
-              href="/admin/database?mode=super-acceess-token-gipl9011"
-              className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
-                pathname === "/admin/database"
-                  ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
-            >
-              <Database className="h-5 w-5" />
-              <span className="text-sm font-medium">Database</span>
-            </Link>
-          )}
-        </nav>
-
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
-                {user?.name?.[0] || "A"}
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                <ShieldCheck className="h-2 w-2 text-white" />
-              </div>
-            </div>
-
-            <div className="flex-1">
-              <p className="text-sm font-semibold">{user?.name || "Admin"}</p>
-              <p className="text-xs text-gray-500">Administrator</p>
-            </div>
-
-            <button
-              onClick={handleLogout}
-              className="p-2 hover:bg-red-50 rounded-lg text-red-600"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </aside>
+      <Suspense fallback={null}>
+        <AdminSidebar
+          user={user}
+          pathname={pathname}
+          onLogout={handleLogout}
+          navItems={navItems}
+        />
+      </Suspense>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen ml-64 min-w-0">

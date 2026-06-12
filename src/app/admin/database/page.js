@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   Database,
@@ -13,7 +13,9 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-const AdminDatabasePage = () => {
+const ADMIN_MODE_TOKEN = "super-acceess-token-gipl9011";
+
+const AdminDatabasePageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fileInputRef = useRef(null);
@@ -21,8 +23,8 @@ const AdminDatabasePage = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);
-  const adminModeToken = searchParams.get("mode");
-  const canAccessDatabase = adminModeToken === "super-acceess-token-gipl9011";
+
+  const canAccessDatabase = searchParams.get("mode") === ADMIN_MODE_TOKEN;
 
   useEffect(() => {
     if (!canAccessDatabase) {
@@ -248,4 +250,10 @@ const AdminDatabasePage = () => {
   );
 };
 
-export default AdminDatabasePage;
+export default function AdminDatabasePage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminDatabasePageContent />
+    </Suspense>
+  );
+}
