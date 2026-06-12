@@ -16,6 +16,7 @@ import {
   FileText,
   Lightbulb,
   Package,
+  Database,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -62,6 +63,7 @@ const AdminLayout = ({ children }) => {
     { href: "/admin/messages", label: "Messages", icon: MessageSquare },
     { href: "/admin/blogs", label: "Blogs", icon: FileText },
     { href: "/admin/packages", label: "Packages", icon: Package },
+    { href: "/admin/database", label: "Database", icon: Database },
     // { href: "/admin/topic-suggestions", label: "Topic Suggestions", icon: Lightbulb },
   ];
 
