@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getGoogleTokens, getGoogleUserInfo } from '@/lib/googleAuth';
 import { signJwt } from '@/lib/auth';
+import { getCookieSecureFlag } from '@/lib/session-cookie';
 import { cookies } from 'next/headers';
 
 export async function GET(req) {
@@ -72,7 +73,7 @@ export async function GET(req) {
         const cookieStore = await cookies();
         cookieStore.set('auth_token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: getCookieSecureFlag(req),
             sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60,
             path: '/',

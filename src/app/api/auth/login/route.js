@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { comparePassword, signJwt } from "@/lib/auth";
+import { getCookieSecureFlag } from "@/lib/session-cookie";
 import { cookies } from "next/headers";
 
 export async function POST(request) {
@@ -42,7 +43,7 @@ export async function POST(request) {
         const cookieStore = await cookies();
         cookieStore.set("auth_token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: getCookieSecureFlag(request),
             sameSite: "lax",
             maxAge: 60 * 60 * 24 * 7, // 1 week
             path: "/",
