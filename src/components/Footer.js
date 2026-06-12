@@ -53,7 +53,7 @@ const Footer = () => {
             </Link>
 
             <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-md mx-auto md:mx-0">
-              Empowering businesses across USA & UK markets with strategic recruitment solutions and IT career support services since 2021.
+              Empowering xxxx businesses across USA & UK markets with strategic recruitment solutions and IT career support services since 2021.
             </p>
 
             <div className="flex space-x-4 justify-center md:justify-start">
